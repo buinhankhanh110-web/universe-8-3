@@ -138,6 +138,8 @@ firstStar.style.top = (centerY - 22) + "px";
 document.body.appendChild(firstStar);
 
 /* Sau 3 giây → các sao khác bay từ rìa vào */
+let orbitStars = [];
+
 setTimeout(() => {
 
     for (let i = 1; i < totalStars; i++) {
@@ -149,7 +151,6 @@ setTimeout(() => {
         star.style.width = size + "px";
         star.style.height = size + "px";
 
-        /* Xuất phát từ rìa màn hình */
         let angle = Math.random() * Math.PI * 2;
         let radius = Math.max(window.innerWidth, window.innerHeight);
 
@@ -161,7 +162,6 @@ setTimeout(() => {
 
         document.body.appendChild(star);
 
-        /* Bay vào vị trí ngẫu nhiên */
         let finalX = Math.random() * window.innerWidth;
         let finalY = Math.random() * window.innerHeight;
 
@@ -170,10 +170,34 @@ setTimeout(() => {
             star.style.left = finalX + "px";
             star.style.top = finalY + "px";
         }, 100);
+
+        orbitStars.push({
+            element: star,
+            baseX: finalX,
+            baseY: finalY,
+            angle: Math.random() * Math.PI * 2,
+            speed: 0.002 + Math.random() * 0.003,
+            radius: 10 + Math.random() * 20
+        });
     }
+
+    animateOrbit();
 
 }, 3000);
 
+function animateOrbit() {
+    orbitStars.forEach(s => {
+        s.angle += s.speed;
+
+        let x = s.baseX + Math.cos(s.angle) * s.radius;
+        let y = s.baseY + Math.sin(s.angle) * s.radius;
+
+        s.element.style.left = x + "px";
+        s.element.style.top = y + "px";
+    });
+
+    requestAnimationFrame(animateOrbit);
+}
 </script>
 
 </body>
