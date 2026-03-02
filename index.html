@@ -5,64 +5,64 @@
 <title>30 Vũ Trụ Riêng</title>
 
 <style>
-body {
+html, body {
     margin: 0;
+    padding: 0;
     overflow: hidden;
-    background: radial-gradient(circle at center, #050510 0%, #000000 80%);
+    background: #000000;
     font-family: Arial, sans-serif;
 }
 
-/* Canvas background */
+/* Canvas nền */
 canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: #000000;
 }
 
-/* Star */
+/* Ngôi sao */
 .star {
     position: absolute;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease;
 }
 
 /* Hover phóng to */
 .star:hover {
-    transform: scale(1.2);
+    transform: scale(1.15);
 }
 
-/* Core */
+/* Lõi sáng */
 .star::before {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: radial-gradient(circle, white 0%, #9be7ff 40%, rgba(155,231,255,0.2) 70%, transparent 80%);
-    animation: pulse 2s infinite ease-in-out;
+    background: radial-gradient(circle, white 0%, #8ee6ff 40%, rgba(142,230,255,0.2) 70%, transparent 85%);
+    animation: pulse 2.5s infinite ease-in-out;
 }
 
-/* Glow */
+/* Glow lớn */
 .star::after {
     content: "";
     position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
+    width: 220%;
+    height: 220%;
+    top: -60%;
+    left: -60%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(155,231,255,0.4), transparent 70%);
-    filter: blur(20px);
+    background: radial-gradient(circle, rgba(142,230,255,0.4), transparent 70%);
+    filter: blur(25px);
 }
 
 @keyframes pulse {
-    0% { transform: scale(0.9); opacity: 0.8; }
+    0% { transform: scale(0.9); opacity: 0.7; }
     50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(0.9); opacity: 0.8; }
+    100% { transform: scale(0.9); opacity: 0.7; }
 }
 
 /* Text intro */
@@ -86,55 +86,60 @@ canvas {
 
 <body>
 
-<canvas id="starsBg"></canvas>
+<canvas id="bg"></canvas>
 <div class="intro-text">30 vũ trụ. 30 điều đặc biệt.</div>
 
 <script>
-const canvas = document.getElementById("starsBg");
+const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-/* Background tiny stars */
-let bgStars = [];
+/* Vẽ nền đen mỗi frame (tránh trắng) */
+function drawBackground() {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    for (let i = 0; i < starsBg.length; i++) {
+        ctx.beginPath();
+        ctx.arc(starsBg[i].x, starsBg[i].y, starsBg[i].r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    requestAnimationFrame(drawBackground);
+}
+
+/* Sao nhỏ nền */
+let starsBg = [];
 for (let i = 0; i < 200; i++) {
-    bgStars.push({
+    starsBg.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         r: Math.random() * 1.5
     });
 }
 
-function drawBg() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "white";
-    bgStars.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fill();
-    });
-    requestAnimationFrame(drawBg);
-}
-drawBg();
+drawBackground();
 
-/* Main stars */
-
+/* Stars chính */
 let totalStars = 30;
 let centerX = window.innerWidth / 2;
 let centerY = window.innerHeight / 2;
 
-/* 1 sao trung tâm trước */
+/* 1 sao trung tâm xuất hiện trước */
 let firstStar = document.createElement("div");
 firstStar.className = "star";
-firstStar.style.width = "40px";
-firstStar.style.height = "40px";
-firstStar.style.left = (centerX - 20) + "px";
-firstStar.style.top = (centerY - 20) + "px";
+firstStar.style.width = "45px";
+firstStar.style.height = "45px";
+firstStar.style.left = (centerX - 22) + "px";
+firstStar.style.top = (centerY - 22) + "px";
 document.body.appendChild(firstStar);
 
-/* Sau 3s → các sao khác bay vào */
+/* Sau 3 giây → các sao khác bay từ rìa vào */
 setTimeout(() => {
+
     for (let i = 1; i < totalStars; i++) {
 
         let star = document.createElement("div");
@@ -144,7 +149,7 @@ setTimeout(() => {
         star.style.width = size + "px";
         star.style.height = size + "px";
 
-        /* xuất hiện từ rìa màn hình */
+        /* Xuất phát từ rìa màn hình */
         let angle = Math.random() * Math.PI * 2;
         let radius = Math.max(window.innerWidth, window.innerHeight);
 
@@ -156,7 +161,7 @@ setTimeout(() => {
 
         document.body.appendChild(star);
 
-        /* animate vào vị trí */
+        /* Bay vào vị trí ngẫu nhiên */
         let finalX = Math.random() * window.innerWidth;
         let finalY = Math.random() * window.innerHeight;
 
@@ -166,7 +171,9 @@ setTimeout(() => {
             star.style.top = finalY + "px";
         }, 100);
     }
+
 }, 3000);
+
 </script>
 
 </body>
