@@ -129,11 +129,23 @@ setTimeout(() => {
         let finalX = Math.random() * window.innerWidth;
         let finalY = Math.random() * window.innerHeight;
 
-        // spawn từ ngoài màn hình
-        let angle = Math.random() * Math.PI * 2;
-        let spawnRadius = Math.max(window.innerWidth, window.innerHeight);
-        let startX = centerX + Math.cos(angle) * spawnRadius;
-        let startY = centerY + Math.sin(angle) * spawnRadius;
+       // spawn từ rìa màn hình (chắc chắn nằm ngoài)
+let side = Math.floor(Math.random() * 4);
+let startX, startY;
+
+if (side === 0) { // từ trên
+    startX = Math.random() * window.innerWidth;
+    startY = -100;
+} else if (side === 1) { // từ phải
+    startX = window.innerWidth + 100;
+    startY = Math.random() * window.innerHeight;
+} else if (side === 2) { // từ dưới
+    startX = Math.random() * window.innerWidth;
+    startY = window.innerHeight + 100;
+} else { // từ trái
+    startX = -100;
+    startY = Math.random() * window.innerHeight;
+}
 
         star.style.left = startX + "px";
         star.style.top = startY + "px";
