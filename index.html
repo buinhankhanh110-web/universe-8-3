@@ -2,29 +2,33 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>8/3 - Special Universe for Her</title>
+    <title>8/3 - Our Classroom Universe</title>
     <style>
-        :root {
-            --pink-light: #ff75c3;
-            --pink-dark: #ffa647;
-            --blue-galaxy: #001529;
-            --glass: rgba(255, 255, 255, 0.15);
-        }
-
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
             overflow: hidden; font-family: 'Segoe UI', sans-serif;
             background: #000; color: white;
         }
 
-        canvas { position: fixed; top: 0; left: 0; z-index: 1; }
+        /* Lớp nền chính để hiển thị hình ảnh vũ trụ */
+        #main-background {
+            position: fixed; inset: 0; z-index: 1;
+            background-size: cover; background-position: center;
+            transition: background-image 2s ease-in-out;
+            background-image: url('image_0.png'); /* Nền mặc định */
+        }
 
-        /* MÀN HÌNH LOGIN */
-        #login-gate {
-            position: fixed; inset: 0; z-index: 100;
+        /* Lớp phủ mờ (vẫn cho phép nhìn thấy nền) */
+        .overlay {
+            position: fixed; inset: 0; z-index: 2;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: radial-gradient(circle, #300 0%, #000 100%);
-            transition: 2s ease-in-out;
+            backdrop-filter: blur(5px);
+            transition: 1.5s ease;
+        }
+
+        /* GIAI ĐOẠN 1: CỔNG ĐỎ & MẬT KHẨU LỚP */
+        #login-gate {
+            background: radial-gradient(circle, #300 0%, transparent 100%);
         }
 
         .red-portal {
@@ -35,46 +39,34 @@
 
         @keyframes glow { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
 
-        input {
-            background: var(--glass); border: 1px solid white; padding: 12px;
-            color: white; border-radius: 25px; text-align: center; outline: none;
-            backdrop-filter: blur(5px); width: 200px; margin: 10px;
-        }
-
-        button {
-            padding: 12px 30px; border-radius: 25px; border: none;
-            background: white; color: black; font-weight: bold; cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover { transform: scale(1.1); box-shadow: 0 0 20px white; }
-
-        /* VŨ TRỤ SAO */
+        /* GIAI ĐOẠN 2: VŨ TRỤ NỞ RA & 30 NGÔI SAO */
         #universe {
-            display: none; position: fixed; inset: 0; z-index: 10;
-            background: radial-gradient(circle at center, #002b5b 0%, #000 100%);
+            display: none; position: fixed; inset: 0; z-index: 3;
+            opacity: 0; transition: opacity 2s ease;
         }
+
+        /* Hiệu ứng nấp nháy cho các ngôi sao */
+        @keyframes starTwinkle { 0%, 100% { opacity: 0.5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.2); } }
 
         .star-entity {
-            position: absolute; width: 50px; height: 50px;
+            position: absolute; width: 40px; height: 40px;
             border-radius: 50%; cursor: pointer;
-            background-size: cover; background-position: center;
-            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+            border: 2px solid white;
             transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid rgba(255,255,255,0.3);
+            animation: starTwinkle 3s infinite;
         }
 
-        .star-entity:hover { transform: scale(1.5); z-index: 20; box-shadow: 0 0 40px #0ff; }
+        .star-entity:hover { transform: scale(1.8) !important; z-index: 20; box-shadow: 0 0 40px #0ff; }
 
-        /* TRANG RIÊNG CỦA MỖI BẠN */
+        /* GIAI ĐOẠN 3: VŨ TRỤ CÁ NHÂN */
         #personal-page {
             position: fixed; inset: 0; z-index: 50; display: none;
-            background: linear-gradient(135deg, #001529 0%, #4b0082 50%, #ff75c3 100%);
-            justify-content: center; align-items: center;
             backdrop-filter: blur(20px);
+            justify-content: center; align-items: center;
         }
 
         .glass-card {
-            background: var(--glass); padding: 40px; border-radius: 30px;
+            background: rgba(255, 255, 255, 0.15); padding: 40px; border-radius: 30px;
             border: 1px solid rgba(255,255,255,0.3); width: 85%; max-width: 500px;
             text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
@@ -82,21 +74,30 @@
         .big-avatar {
             width: 150px; height: 150px; border-radius: 50%;
             margin: 0 auto 20px; border: 5px solid white;
-            box-shadow: 0 0 30px var(--pink-light);
+            box-shadow: 0 0 30px #ff75c3;
             background-size: cover; background-position: center;
         }
 
         .info-content { text-align: left; line-height: 1.6; }
-        .info-content h2 { text-align: center; color: var(--pink-light); margin-bottom: 5px; }
+        .info-content h2 { text-align: center; color: #ff75c3; margin-bottom: 5px; }
         .info-content p { font-style: italic; color: #eee; }
+
+        input, button {
+            background: rgba(255, 255, 255, 0.15); border: 1px solid white; padding: 12px;
+            color: white; border-radius: 25px; text-align: center; outline: none;
+            backdrop-filter: blur(5px); width: 200px; margin: 10px;
+        }
+
+        button { background: white; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.1); box-shadow: 0 0 20px white; }
 
     </style>
 </head>
 <body>
 
-    <canvas id="starCanvas"></canvas>
+    <div id="main-background"></div>
 
-    <div id="login-gate">
+    <div id="login-gate" class="overlay">
         <div class="red-portal"></div>
         <h2 style="letter-spacing: 2px;">VŨ TRỤ 8/3</h2>
         <input type="password" id="gatePass" placeholder="Mật khẩu của lớp...">
@@ -111,8 +112,8 @@
             <h3 id="previewName">Tên Bạn Nữ</h3>
             <input type="password" id="girlPass" placeholder="Nhập mã riêng của bạn...">
             <br>
-            <button onclick="accessHeart()">MỞ KHÓA TRÁI TIM</button>
-            <button onclick="backToSpace()" style="background:none; color:white;">Quay lại</button>
+            <button onclick="accessHeart()">MỞ KHÓA</button>
+            <button onclick="backToSpace()" style="background:none; color:white; border: none;">Quay lại</button>
         </div>
 
         <div class="glass-card" id="card-step-2" style="display:none">
@@ -134,82 +135,65 @@
         const girlsData = Array.from({ length: 30 }, (_, i) => ({
             name: `Bạn Nữ ${i + 1}`,
             dob: "08/03/2008",
-            img: "https://via.placeholder.com/150", // Thay bằng link ảnh thật
-            pass: "123", // Pass riêng
+            // Bạn có thể dùng ảnh là khuôn mặt của bạn đó
+            img: "https://via.placeholder.com/150", 
+            pass: "123", // Mật khẩu riêng từng bạn
             feeling: "Một cô gái vô cùng đặc biệt và là mảnh ghép không thể thiếu của lớp mình!",
             wish: "Chúc bạn luôn tỏa sáng như ngôi sao đẹp nhất trong vũ trụ này. Happy Women's Day!"
         }));
 
         const GATE_PASSWORD = "83";
         let activeGirl = null;
+        const mainBg = document.getElementById('main-background');
 
-        // XỬ LÝ CANVAS (SAO NỀN)
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-
-        function initCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<400; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 1.5,
-                    opacity: Math.random(),
-                    speed: Math.random() * 0.3
-                });
-            }
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "white";
-            particles.forEach(p => {
-                ctx.globalAlpha = p.opacity;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-                ctx.fill();
-                p.y -= p.speed;
-                if(p.y < 0) p.y = canvas.height;
-            });
-            requestAnimationFrame(draw);
-        }
-
-        // CHỨC NĂNG CHÍNH
+        // MỞ KHÓA VŨ TRỤ XANH (GIAI ĐOẠN 2)
         function unlockUniverse() {
-            if(document.getElementById('gatePass').value === GATE_PASSWORD) {
+            const passInput = document.getElementById('gatePass');
+            if(passInput.value === GATE_PASSWORD) {
+                // Chuyển sang ảnh nền 2
+                mainBg.style.backgroundImage = "url('image_1.png')";
+                
+                // Màn 1 mờ dần và biến mất
                 document.getElementById('login-gate').style.opacity = '0';
                 setTimeout(() => {
                     document.getElementById('login-gate').style.display = 'none';
                     document.getElementById('universe').style.display = 'block';
-                    spawnStars();
+                    setTimeout(() => {
+                        document.getElementById('universe').style.opacity = '1';
+                        spawnStars();
+                    }, 100);
                 }, 1000);
             } else { alert("Mã không gian chưa đúng!"); }
         }
 
+        // TẠO 30 NGÔI SAO TRONG VŨ TRỤ XANH
         function spawnStars() {
             const container = document.getElementById('universe');
             girlsData.forEach((g, i) => {
                 const star = document.createElement('div');
                 star.className = 'star-entity';
-                star.style.backgroundImage = `url(${g.img})`;
                 
-                // Xuất phát từ tâm (Big Bang)
+                // Bạn có thể cho ảnh khuôn mặt vào ngôi sao, 
+                // nhưng mình khuyên nên giữ cho ngôi sao lấp lánh như ảnh 2 
+                // và chỉ hiện ảnh khi được nhấp vào (sang màn 3)
+                // star.style.backgroundImage = `url(${g.img})`;
+                star.style.backgroundColor = (i % 2 === 0) ? '#0ff' : '#f33'; // Xanh và đỏ xen kẽ như ảnh 2
+                
+                // Hiệu ứng "nở ra" từ tâm
                 star.style.left = "50%";
                 star.style.top = "50%";
                 star.style.transform = "translate(-50%, -50%) scale(0)";
 
                 container.appendChild(star);
 
-                // Nở ra vị trí ngẫu nhiên
+                // Bay ra vị trí ngẫu nhiên
                 setTimeout(() => {
                     star.style.left = (Math.random() * 80 + 10) + "%";
                     star.style.top = (Math.random() * 80 + 10) + "%";
                     star.style.transform = "scale(1)";
                 }, i * 50 + 500);
 
+                // Chuyển sang trang riêng khi được nhấp vào
                 star.onclick = () => {
                     activeGirl = g;
                     document.getElementById('personal-page').style.display = 'flex';
@@ -222,8 +206,13 @@
             });
         }
 
+        // MỞ KHÓA VŨ TRỤ CÁ NHÂN (GIAI ĐOẠN 3)
         function accessHeart() {
-            if(document.getElementById('girlPass').value === activeGirl.pass) {
+            const girlPassInput = document.getElementById('girlPass');
+            if(girlPassInput.value === activeGirl.pass) {
+                // Chuyển sang ảnh nền 3 (vũ trụ cá nhân)
+                mainBg.style.backgroundImage = "url('image_2.png')";
+                
                 document.getElementById('card-step-1').style.display = 'none';
                 document.getElementById('card-step-2').style.display = 'block';
                 document.getElementById('finalAvatar').style.backgroundImage = `url(${activeGirl.img})`;
@@ -231,15 +220,16 @@
                 document.getElementById('finalDob').innerText = "Ngày sinh: " + activeGirl.dob;
                 document.getElementById('finalFeeling').innerText = activeGirl.feeling;
                 document.getElementById('finalWish').innerText = activeGirl.wish;
-            } else { alert("Sai mật khẩu rồi bạn ơi!"); }
+            } else { alert("Mật khẩu riêng chưa đúng!"); }
         }
 
+        // QUAY LẠI VŨ TRỤ XANH
         function backToSpace() {
+            // Quay lại ảnh nền 2 (vũ trụ chung)
+            mainBg.style.backgroundImage = "url('image_1.png')";
             document.getElementById('personal-page').style.display = 'none';
         }
 
-        window.onload = () => { initCanvas(); draw(); };
-        window.onresize = initCanvas;
     </script>
 </body>
 </html>
