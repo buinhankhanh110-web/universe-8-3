@@ -2,37 +2,39 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>GALAXY 10A1 - Cinematic Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GALAXY 10A1 - FINAL VERSION</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
-        
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+
+        /* --- PHẦN STYLE (GIAO DIỆN) --- */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: 'Segoe UI', sans-serif; }
         canvas { display: block; position: absolute; top: 0; left: 0; }
 
-        /* Giao diện cổng bắt đầu theo mẫu bạn gửi */
+        /* Cổng bắt đầu - Dựa theo mẫu ảnh GALAXY 8-3 bạn thích */
         #gate-container {
             position: fixed; inset: 0; z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: #000; transition: opacity 1.5s ease;
+            background: radial-gradient(circle at center, #001a1a 0%, #000 100%);
+            transition: opacity 1.5s ease;
         }
 
-        /* Vòng tròn năng lượng neon */
         .energy-orb {
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, #00f2ff 0%, rgba(0, 242, 255, 0.5) 40%, transparent 70%);
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, #00f2ff 0%, rgba(0, 242, 255, 0.2) 60%, transparent 100%);
             border-radius: 50%; border: 2px solid #00f2ff;
-            box-shadow: 0 0 50px #00f2ff, inset 0 0 30px #00f2ff;
-            margin-bottom: 50px; animation: orbPulse 3s infinite ease-in-out;
+            box-shadow: 0 0 60px #00f2ff, inset 0 0 30px #00f2ff;
+            margin-bottom: 40px; animation: orbPulse 3s infinite ease-in-out;
         }
 
         @keyframes orbPulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; filter: blur(2px); }
-            50% { transform: scale(1.05); opacity: 1; filter: blur(0px); }
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
         }
 
         .main-title {
             font-family: 'Orbitron', sans-serif; font-size: 4rem; color: #fff;
-            letter-spacing: 15px; text-transform: uppercase; margin: 0;
+            letter-spacing: 12px; text-transform: uppercase; margin: 0;
             text-shadow: 0 0 20px #00f2ff;
         }
 
@@ -40,8 +42,8 @@
 
         .code-input {
             background: rgba(255,255,255,0.05); border: 1.5px solid #00f2ff;
-            padding: 12px 30px; color: #fff; font-size: 1rem; border-radius: 25px;
-            outline: none; width: 280px; text-align: center; letter-spacing: 2px;
+            padding: 15px; color: #fff; font-size: 1rem; border-radius: 30px;
+            outline: none; width: 280px; text-align: center; letter-spacing: 5px;
             font-family: 'Orbitron', sans-serif; margin-bottom: 25px;
         }
 
@@ -51,11 +53,24 @@
             border-radius: 30px; border: none; font-weight: 900;
             text-transform: uppercase; letter-spacing: 3px; cursor: pointer;
             box-shadow: 0 0 20px rgba(255,255,255,0.4); transition: 0.4s;
+            font-family: 'Orbitron', sans-serif;
         }
+        .btn-launch:hover { background: #00f2ff; transform: scale(1.1); box-shadow: 0 0 40px #00f2ff; }
 
-        .btn-launch:hover { transform: scale(1.1); box-shadow: 0 0 40px #00f2ff; background: #00f2ff; }
+        /* Modal lời chúc */
+        #wish-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(0, 8, 20, 0.95); border: 1px solid #00f2ff;
+            padding: 40px; color: white; text-align: center; z-index: 1000;
+            width: 350px; border-radius: 20px; backdrop-filter: blur(15px);
+            opacity: 0; pointer-events: none; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #wish-modal.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 
-        .hidden { opacity: 0; pointer-events: none; }
+        .modal-name { font-family: 'Orbitron'; color: #00f2ff; font-size: 2rem; margin-bottom: 15px; }
+        .modal-wish { font-size: 1.1rem; line-height: 1.6; color: #ccc; }
+
+        .hidden { opacity: 0 !important; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -65,82 +80,132 @@
 <div id="gate-container">
     <div class="energy-orb"></div>
     <h1 class="main-title">GALAXY 8-3</h1>
-    
     <div class="input-group">
-        <input type="password" id="pass" class="code-input" placeholder="MẬT MÃ KHÔNG GIAN">
-        <button class="btn-launch" onclick="Universe.ignite()">Khởi Động</button>
+        <input type="password" id="pass" class="code-input" placeholder="MẬT MÃ: 83">
+        <button class="btn-launch" onclick="Galaxy.ignite()">Khởi Động</button>
     </div>
 </div>
 
+<div id="wish-modal">
+    <div class="modal-name" id="dispName"></div>
+    <div class="modal-wish" id="dispWish"></div>
+    <button onclick="Galaxy.closeModal()" style="margin-top:25px; background:none; border:1px solid #fff; color:#fff; padding:8px 25px; border-radius:20px; cursor:pointer; font-family:'Orbitron'">ĐÓNG</button>
+</div>
+
 <script>
-/**
- * PHẦN 1: CORE ENGINE & UNIVERSE INITIALIZATION
- */
-const Universe = {
+/** --- PHẦN SCRIPT (LOGIC) --- **/
+const girlsData = [
+    {n:"Bảo Ngọc", w:"Viên ngọc quý tỏa sáng rực rỡ nhất 10A1."}, {n:"Hà Phương", w:"Dịu dàng như dải ngân hà tĩnh lặng."},
+    {n:"Tuyết Mai", w:"Xinh đẹp kiên cường như nhành Mai trong tuyết."}, {n:"Diệp Chi", w:"Mãi rạng rỡ và tràn đầy năng lượng như mầm xanh."},
+    {n:"Khánh Huyền", w:"Nụ cười của Huyền là ánh sáng rực rỡ nhất lớp."}, {n:"Ngọc Lan", w:"Dịu dàng và thanh cao như đóa Lan trắng."},
+    {n:"Phương Thảo", w:"Sức sống mãnh liệt luôn xanh ngát giữa ngàn sao."}, {n:"Thu Hà", w:"Trong trẻo và nhẹ nhàng như mùa thu Hà Nội."},
+    {n:"Hà Chi", w:"Tỏa sáng rực rỡ theo cách riêng của chính mình."}, {n:"Thùy Linh", w:"Hạnh phúc ngọt ngào luôn mỉm cười với em."},
+    {n:"Huyền Trang", w:"Xinh đẹp, học giỏi và luôn tự tin rạng ngời."}, {n:"Phương Linh", w:"Mọi điều tốt lành nhất sẽ đến với Linh nhé."},
+    {n:"Quỳnh Anh", w:"Kiêu sa như đóa hoa Quỳnh nở giữa đêm sao."}, {n:"Mai Hương", w:"Mãi giữ nét duyên thầm dịu dàng này nhé."},
+    {n:"Hà My", w:"Cô gái nhỏ đáng yêu nhất hệ mặt trời 10A1."}, {n:"Lan Anh", w:"Ánh hào quang dẫn lối đến mọi thành công."},
+    {n:"Thùy Dương", w:"Ấm áp và tràn đầy năng lượng như nắng ban mai."}, {n:"Yến Nhi", w:"Bay cao, bay xa đến những chân trời ước mơ."},
+    {n:"Bảo Quyên", w:"Xinh đẹp, quý phái và vô cùng tinh tế."}, {n:"Huyền Diệu", w:"Cuộc sống của em sẽ luôn diệu kỳ như cổ tích."},
+    {n:"Trúc Mai", w:"Mạnh mẽ như trúc, xinh đẹp rạng rỡ như mai."}, {n:"Tú Anh", w:"Thông minh và tỏa sáng rực rỡ như sao Bắc Đẩu."},
+    {n:"Ngọc Mai", w:"Viên ngọc quý giá nhất mà lớp mình có được."}, {n:"Hoàng Yến", w:"Vui tươi và hồn nhiên như chú chim nhỏ yêu đời."},
+    {n:"Ngọc Diệp", w:"Lá ngọc cành vàng, luôn được yêu thương trân trọng."}, {n:"Hương Giang", w:"Sâu sắc và êm đềm như dòng sông Hương chảy trôi."},
+    {n:"Bảo Chi", w:"Vầng trăng sáng ngời, quý giá và đầy yêu thương."}, {n:"Mai Phương", w:"Tương lai rạng rỡ đang rộng mở chờ đón Phương."},
+    {n:"Hồng Nhung", w:"Kiêu sa, rực rỡ và đầy cuốn hút như đóa hồng."}, {n:"Hoài Thương", w:"Gửi trọn yêu thương đến cô gái ngọt ngào này."}
+];
+
+const Galaxy = {
     canvas: document.getElementById('universe'),
-    stars: [], speed: 0.8, targetSpeed: 0.8,
+    stars: [], constellation: [], speed: 0.8, targetSpeed: 0.8,
+    isFormed: false,
 
     init() {
         this.ctx = this.canvas.getContext('2d');
         this.resize();
-        this.createStars();
-        this.render();
+        // Khởi tạo 1500 ngôi sao 3D
+        for(let i=0; i<1500; i++) this.stars.push({ x:Math.random()*4000-2000, y:Math.random()*4000-2000, z:Math.random()*4000, pz:0 });
+        this.animate();
         window.onresize = () => this.resize();
+        this.canvas.onclick = (e) => this.checkClick(e);
     },
 
-    resize() {
-        this.w = this.canvas.width = window.innerWidth;
-        this.h = this.canvas.height = window.innerHeight;
-    },
-
-    createStars() {
-        // Khởi tạo 1500 ngôi sao có chiều sâu Z chuẩn cinematic
-        for(let i=0; i<1500; i++) {
-            this.stars.push({
-                x: Math.random() * 4000 - 2000,
-                y: Math.random() * 4000 - 2000,
-                z: Math.random() * 4000,
-                pz: 0
-            });
-        }
-    },
+    resize() { this.w = this.canvas.width = window.innerWidth; this.h = this.canvas.height = window.innerHeight; },
 
     ignite() {
-        const p = document.getElementById('pass').value;
-        if(p !== "83") return alert("Mật mã không đúng!");
-        
+        if(document.getElementById('pass').value !== "83") return alert("Mật mã sai!");
         document.getElementById('gate-container').classList.add('hidden');
-        // Kích hoạt Warp Drive (Phần này sẽ xử lý ở Script tiếp theo)
-        this.targetSpeed = 60;
+        this.targetSpeed = 70; // Warp drive
+        setTimeout(() => {
+            this.targetSpeed = 0.5;
+            this.isFormed = true;
+            this.buildConstellation();
+        }, 2500);
     },
 
-    render() {
+    buildConstellation() {
+        const cx = this.w/2, cy = this.h/2, u = Math.min(this.w, this.h)/10;
+        const pts = [
+            // Tọa độ 10A1
+            {x:cx-4*u, y:cy-1.5*u}, {x:cx-4*u, y:cy}, {x:cx-4*u, y:cy+1.5*u}, // 1
+            {x:cx-2*u, y:cy-1.5*u}, {x:cx-1*u, y:cy-0.8*u}, {x:cx-1*u, y:cy+0.8*u}, {x:cx-2*u, y:cy+1.5*u}, {x:cx-3*u, y:cy+0.8*u}, {x:cx-3*u, y:cy-0.8*u}, // 0
+            {x:cx+1*u, y:cy+1.5*u}, {x:cx+2*u, y:cy-1.5*u}, {x:cx+3*u, y:cy+1.5*u}, {x:cx+1.5*u, y:cy+0.3*u}, {x:cx+2.7*u, y:cy+0.3*u}, // A
+            {x:cx+4.5*u, y:cy-1.5*u}, {x:cx+4.5*u, y:cy+1.5*u} // 1
+        ];
+        this.constellation = girlsData.map((g, i) => {
+            let p = pts[i % pts.length];
+            return { ...g, x:p.x, y:p.y, op:0, a:Math.random()*10 };
+        });
+    },
+
+    checkClick(e) {
+        if(!this.isFormed) return;
+        this.constellation.forEach(s => {
+            if(Math.hypot(e.clientX-s.x, e.clientY-s.y) < 25) {
+                document.getElementById('dispName').innerText = s.n;
+                document.getElementById('dispWish').innerText = s.w;
+                document.getElementById('wish-modal').classList.add('active');
+            }
+        });
+    },
+
+    closeModal() { document.getElementById('wish-modal').classList.remove('active'); },
+
+    animate() {
         this.speed += (this.targetSpeed - this.speed) * 0.05;
         this.ctx.fillStyle = '#000';
-        this.ctx.fillRect(0, 0, this.w, this.h);
+        this.ctx.fillRect(0,0,this.w,this.h);
 
+        // Vẽ sao Starfield
         this.stars.forEach(s => {
-            s.pz = s.z;
-            s.z -= this.speed;
+            s.pz = s.z; s.z -= this.speed;
             if(s.z < 1) { s.z = 4000; s.pz = s.z; }
-
-            // Thuật toán chiếu 3D sang 2D
-            let x = (s.x / s.z) * this.w + this.w/2;
-            let y = (s.y / s.z) * this.h + this.h/2;
-            let px = (s.x / s.pz) * this.w + this.w/2;
-            let py = (s.y / s.pz) * this.h + this.h/2;
-
-            this.ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1, 1 - s.z/4000)})`;
-            this.ctx.lineWidth = (1 - s.z/4000) * 3;
-            this.ctx.beginPath();
-            this.ctx.moveTo(px, py);
-            this.ctx.lineTo(x, y);
-            this.ctx.stroke();
+            let x = (s.x/s.z)*this.w + this.w/2, y = (s.y/s.z)*this.h + this.h/2;
+            let px = (s.x/s.pz)*this.w + this.w/2, py = (s.y/s.pz)*this.h + this.h/2;
+            this.ctx.strokeStyle = `rgba(255,255,255,${1-s.z/4000})`;
+            this.ctx.lineWidth = (1-s.z/4000)*3;
+            this.ctx.beginPath(); this.ctx.moveTo(px,py); this.ctx.lineTo(x,y); this.ctx.stroke();
         });
 
-        requestAnimationFrame(() => this.render());
+        // Vẽ Chòm sao 10A1
+        if(this.isFormed && this.speed < 1) {
+            this.constellation.forEach((s, i) => {
+                s.op = Math.min(1, s.op+0.02);
+                this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#00f2ff';
+                this.ctx.fillStyle = `rgba(255,255,255,${s.op})`;
+                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, 4, 0, 7); this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+                
+                // Nối nét cinematic
+                if(i > 0 && Math.hypot(s.x-this.constellation[i-1].x, s.y-this.constellation[i-1].y) < this.w/8) {
+                    this.ctx.strokeStyle = `rgba(0,242,255,${s.op*0.2})`;
+                    this.ctx.beginPath(); this.ctx.moveTo(this.constellation[i-1].x, this.constellation[i-1].y);
+                    this.ctx.lineTo(s.x, s.y); this.ctx.stroke();
+                }
+            });
+        }
+        requestAnimationFrame(() => this.animate());
     }
 };
 
-Universe.init();
+Galaxy.init();
 </script>
+</body>
+</html>
