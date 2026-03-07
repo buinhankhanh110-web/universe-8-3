@@ -4,81 +4,90 @@
     <meta charset="UTF-8">
     <title>8/3 - Hyper-Realistic Classroom Universe</title>
     <style>
-        :root {
-            --cyan-glow: #00ffff;
-            --pink-glow: #ff75c3;
-            --space-black: #000205;
-        }
+       :root {
+    --cyan-glow: #00ffff;
+    --pink-glow: #ff75c3;
+    --space-black: #000205;
+}
 
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background: var(--space-black);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+body, html {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: var(--space-black);
+    font-family: 'Segoe UI', sans-serif;
+}
 
-        canvas { position: fixed; top: 0; left: 0; z-index: 1; outline: none; }
+canvas { position: fixed; top: 0; left: 0; z-index: 1; }
 
-        /* GIAO DIỆN UI LỚP TRÊN */
-        .ui-layer {
-            position: fixed; inset: 0; z-index: 10;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            pointer-events: none; transition: opacity 2s ease;
-        }
+/* LỚP GIAO DIỆN CHÍNH */
+.ui-layer {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    pointer-events: none; transition: 2s;
+}
+.interactive { pointer-events: all; }
 
-        .interactive { pointer-events: all; }
+/* PORTAL CỔNG XANH SIÊU THỰC */
+.portal-container {
+    position: relative; width: 250px; height: 250px; margin-bottom: 50px;
+}
+.portal-ring {
+    position: absolute; inset: 0;
+    border: 2px solid var(--cyan-glow); border-radius: 50%;
+    box-shadow: 0 0 50px var(--cyan-glow), inset 0 0 30px var(--cyan-glow);
+    animation: rotate 10s linear infinite;
+}
+.portal-core {
+    position: absolute; inset: 20px;
+    background: radial-gradient(circle, #fff 0%, var(--cyan-glow) 40%, transparent 70%);
+    border-radius: 50%; filter: blur(8px);
+    animation: pulse 3s ease-in-out infinite;
+}
 
-        /* PORTAL CỔNG XANH SIÊU THỰC */
-        #login-panel {
-            text-align: center; transform: scale(1); transition: 2s cubic-bezier(0.19, 1, 0.22, 1);
-        }
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.15); opacity: 0.8; } }
 
-        .portal-container {
-            position: relative; width: 250px; height: 250px; margin-bottom: 50px;
-        }
+/* TYPOGRAPHY & INPUT */
+.cosmic-title {
+    color: white; font-size: 3.5rem; letter-spacing: 15px;
+    text-shadow: 0 0 30px var(--cyan-glow); margin: 0; text-transform: uppercase;
+}
+input.cosmic-input {
+    margin-top: 30px; background: rgba(255,255,255,0.05);
+    border: 1px solid var(--cyan-glow); padding: 15px 25px;
+    color: white; border-radius: 50px; text-align: center;
+    width: 320px; font-size: 1.2rem; outline: none;
+    backdrop-filter: blur(15px); transition: 0.5s;
+}
+input.cosmic-input:focus { box-shadow: 0 0 40px var(--cyan-glow); background: rgba(0,255,255,0.1); }
 
-        .portal-ring {
-            position: absolute; inset: 0;
-            border: 2px solid var(--cyan-glow); border-radius: 50%;
-            box-shadow: 0 0 50px var(--cyan-glow), inset 0 0 30px var(--cyan-glow);
-            animation: rotate 10s linear infinite;
-        }
+button.launch-btn {
+    margin-top: 25px; padding: 15px 70px; border-radius: 50px;
+    border: none; background: white; color: black; font-weight: 900;
+    cursor: pointer; text-transform: uppercase; letter-spacing: 3px;
+    transition: 0.4s; box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 0 60px white; }
 
-        .portal-core {
-            position: absolute; inset: 20px;
-            background: radial-gradient(circle, #fff 0%, var(--cyan-glow) 40%, transparent 70%);
-            border-radius: 50%; filter: blur(5px);
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
-
-        /* TYPOGRAPHY */
-        .cosmic-title {
-            color: white; font-size: 3rem; letter-spacing: 15px;
-            text-shadow: 0 0 30px var(--cyan-glow); margin: 0; text-transform: uppercase;
-        }
-
-        input.cosmic-input {
-            margin-top: 30px; background: rgba(255,255,255,0.05);
-            border: 1px solid var(--cyan-glow); padding: 15px 25px;
-            color: white; border-radius: 50px; text-align: center;
-            width: 300px; font-size: 1.2rem; outline: none;
-            backdrop-filter: blur(10px); transition: 0.5s;
-        }
-
-        input.cosmic-input:focus { box-shadow: 0 0 30px var(--cyan-glow); background: rgba(0,255,255,0.1); }
-
-        button.launch-btn {
-            margin-top: 20px; padding: 15px 60px; border-radius: 50px;
-            border: none; background: white; color: black; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
-            transition: 0.4s;
-        }
-
-        button.launch-btn:hover { transform: scale(1.1); box-shadow: 0 0 50px white; }
-
-        .hidden { opacity: 0; pointer-events: none; }
+/* HIỆU ỨNG THÔNG TIN CÁ NHÂN (PINK GALAXY) */
+.info-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    display: none; justify-content: center; align-items: center;
+    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px);
+}
+.galaxy-card {
+    background: linear-gradient(135deg, rgba(255, 117, 195, 0.2), rgba(0, 255, 255, 0.15));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 50px; border-radius: 40px; color: white;
+    text-align: center; width: 90%; max-width: 550px;
+    box-shadow: 0 0 60px rgba(255, 117, 195, 0.3);
+}
+.girl-avatar {
+    width: 180px; height: 180px; border-radius: 50%;
+    margin: 0 auto 25px; border: 5px solid white;
+    box-shadow: 0 0 40px var(--pink-glow);
+    background-size: cover; background-position: center;
+}
+.hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -98,123 +107,201 @@
         </div>
     </div>
 
-    <script>
-        /**
-         * HYPER-SPACE ENGINE v4.0
-         * Xương sống của hệ thống vũ trụ 30 thực thể
-         */
+  <script>
+    const CosmicConfig = {
+        starCount: 1500,
+        meteorChance: 0.005,
+        baseSpeed: 0.5,
+        warpSpeed: 40,
+        gatePassword: "83"
+    };
 
-        const CosmicConfig = {
-            starCount: 1500,
-            meteorChance: 0.005,
-            baseSpeed: 0.5,
-            warpSpeed: 40,
-            gatePassword: "83"
-        };
+    // --- CÁC THỰC THỂ VŨ TRỤ ---
 
-        class Particle {
-            constructor(w, h) {
-                this.w = w; this.h = h;
+    class Particle {
+        constructor(w, h) {
+            this.w = w; this.h = h;
+            this.init();
+        }
+        init() {
+            this.x = Math.random() * this.w - this.w / 2;
+            this.y = Math.random() * this.h - this.h / 2;
+            this.z = Math.random() * this.w;
+            this.pz = this.z;
+            this.color = Math.random() > 0.9 ? "#0ff" : "#fff";
+        }
+        update(speed) {
+            this.pz = this.z;
+            this.z -= speed;
+            if (this.z < 1) {
                 this.init();
-            }
-            init() {
-                this.x = Math.random() * this.w - this.w / 2;
-                this.y = Math.random() * this.h - this.h / 2;
-                this.z = Math.random() * this.w;
                 this.pz = this.z;
-                this.color = Math.random() > 0.9 ? "#0ff" : "#fff";
-            }
-            update(speed) {
-                this.pz = this.z;
-                this.z -= speed;
-                if (this.z < 1) {
-                    this.init();
-                    this.pz = this.z;
-                }
-            }
-            draw(ctx, w, h) {
-                let sx = (this.x / this.z) * w + w / 2;
-                let sy = (this.y / this.z) * h + h / 2;
-                let px = (this.x / this.pz) * w + w / 2;
-                let py = (this.y / this.pz) * h + h / 2;
-
-                let r = (1 - this.z / w) * 2;
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = r;
-                ctx.beginPath();
-                ctx.moveTo(px, py);
-                ctx.lineTo(sx, sy);
-                ctx.stroke();
             }
         }
+        draw(ctx, w, h) {
+            let sx = (this.x / this.z) * w + w / 2;
+            let sy = (this.y / this.z) * h + h / 2;
+            let px = (this.x / this.pz) * w + w / 2;
+            let py = (this.y / this.pz) * h + h / 2;
+            let r = (1 - this.z / w) * 2;
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = r;
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(sx, sy);
+            ctx.stroke();
+        }
+    }
 
-        const CosmicEngine = {
-            canvas: null, ctx: null,
-            stars: [],
-            speed: CosmicConfig.baseSpeed,
-            isWarping: false,
-
-            init() {
-                this.canvas = document.getElementById('universe');
-                this.ctx = this.canvas.getContext('2d');
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-
-                for(let i=0; i < CosmicConfig.starCount; i++) {
-                    this.stars.push(new Particle(this.canvas.width, this.canvas.height));
-                }
-                this.render();
-            },
-
-            resize() {
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
-            },
-
-            warpDrive() {
-                const p = document.getElementById('gate-pass').value;
-                if(p === CosmicConfig.gatePassword) {
-                    this.isWarping = true;
-                    document.getElementById('gate-ui').classList.add('hidden');
-                    // Tăng tốc xuyên không
-                    let warpInterval = setInterval(() => {
-                        this.speed += 1;
-                        if(this.speed >= CosmicConfig.warpSpeed) {
-                            clearInterval(warpInterval);
-                            setTimeout(() => this.enterUniverse(), 1500);
-                        }
-                    }, 50);
-                } else { alert("Sai mật mã!"); }
-            },
-
-            enterUniverse() {
-                // Giảm tốc sau khi xuyên không thành công
-                let slowDown = setInterval(() => {
-                    this.speed -= 1;
-                    if(this.speed <= 2) {
-                        clearInterval(slowDown);
-                        this.speed = 2;
-                        // Tại đây sẽ gọi Module 30 ngôi sao bạn nữ
-                        console.log("Welcome to Galaxy 8-3");
-                    }
-                }, 100);
-            },
-
-            render() {
-                // Hiệu ứng Motion Blur bằng cách không xóa sạch canvas
-                this.ctx.fillStyle = "rgba(0, 2, 5, 0.2)";
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-                this.stars.forEach(s => {
-                    s.update(this.speed);
-                    s.draw(this.ctx, this.canvas.width, this.canvas.height);
+    class Nebula {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.points = [];
+            for(let i = 0; i < 5; i++) {
+                this.points.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 400 + 300,
+                    color: i % 2 === 0 ? 'rgba(0, 255, 255, 0.03)' : 'rgba(255, 117, 195, 0.02)'
                 });
-
-                requestAnimationFrame(() => this.render());
             }
-        };
+        }
+        update() {
+            this.points.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+            });
+        }
+        draw(ctx) {
+            this.points.forEach(p => {
+                let grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+                grad.addColorStop(0, p.color);
+                grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad;
+                ctx.globalCompositeOperation = 'screen';
+                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+            });
+        }
+    }
 
-        window.onload = () => CosmicEngine.init();
-    </script>
+    class Meteor {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * this.canvas.width;
+            this.y = -200;
+            this.speed = Math.random() * 15 + 10;
+            this.len = Math.random() * 100 + 50;
+            this.opacity = 1;
+        }
+        update() {
+            this.x += this.speed;
+            this.y += this.speed;
+            this.opacity -= 0.01;
+            if(this.opacity <= 0 || this.y > this.canvas.height) this.reset();
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - this.len, this.y - this.len);
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // --- ENGINE ĐIỀU KHIỂN CHÍNH ---
+
+    const CosmicEngine = {
+        canvas: null, ctx: null,
+        stars: [], meteors: [], nebula: null,
+        speed: CosmicConfig.baseSpeed,
+        isWarping: false,
+
+        init() {
+            this.canvas = document.getElementById('universe');
+            this.ctx = this.canvas.getContext('2d');
+            this.resize();
+            window.addEventListener('resize', () => this.resize());
+
+            // 1. Khởi tạo Nebula
+            this.nebula = new Nebula(this.canvas);
+
+            // 2. Khởi tạo Meteor
+            for(let i=0; i<3; i++) this.meteors.push(new Meteor(this.canvas));
+
+            // 3. Khởi tạo Stars
+            for(let i=0; i < CosmicConfig.starCount; i++) {
+                this.stars.push(new Particle(this.canvas.width, this.canvas.height));
+            }
+            
+            this.render();
+        },
+
+        resize() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        },
+
+        warpDrive() {
+            const p = document.getElementById('gate-pass').value;
+            if(p === CosmicConfig.gatePassword) {
+                this.isWarping = true;
+                document.getElementById('gate-ui').classList.add('hidden');
+                let warpInterval = setInterval(() => {
+                    this.speed += 1;
+                    if(this.speed >= CosmicConfig.warpSpeed) {
+                        clearInterval(warpInterval);
+                        setTimeout(() => this.enterUniverse(), 1500);
+                    }
+                }, 50);
+            } else { alert("Sai mật mã!"); }
+        },
+
+        enterUniverse() {
+            let slowDown = setInterval(() => {
+                this.speed -= 1;
+                if(this.speed <= 2) {
+                    clearInterval(slowDown);
+                    this.speed = 2;
+                    // Kích hoạt Module 30 bạn nữ tại đây
+                    alert("Chào mừng đến với Galaxy 8-3 siêu thực!");
+                }
+            }, 100);
+        },
+
+        render() {
+            // Hiệu ứng Motion Blur
+            this.ctx.fillStyle = "rgba(0, 2, 5, 0.2)";
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Vẽ theo thứ tự lớp (Layering)
+            this.nebula.update();
+            this.nebula.draw(this.ctx);
+
+            this.stars.forEach(s => {
+                s.update(this.speed);
+                s.draw(this.ctx, this.canvas.width, this.canvas.height);
+            });
+
+            this.meteors.forEach(m => {
+                m.update();
+                m.draw(this.ctx);
+            });
+
+            requestAnimationFrame(() => this.render());
+        }
+    };
+
+    window.onload = () => CosmicEngine.init();
+</script>
 </body>
 </html>
