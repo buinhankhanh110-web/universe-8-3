@@ -93,18 +93,22 @@ function draw() {
         let y = s.y * (h / s.z);
 
         // Chế độ Chòm sao (hiện sau khi Login)
-        if(currentScene === 'CONSTELLATION' || currentScene === 'VORTEX') {
-            if(i < 30) {
-                let g = girls[i];
-                // Hiệu ứng hút vào tâm (Vortex) ở bước 9
-                if(currentScene === 'VORTEX') {
-                    let angle = 0.12;
-                    let oldX = g.x;
-                    g.x = (g.x * Math.cos(angle) - g.y * Math.sin(angle)) * 0.96;
-                    g.y = (oldX * Math.sin(angle) + g.y * Math.cos(angle)) * 0.96;
-                    shake = 25;
-                    if(Math.abs(g.x) < 5) currentScene = 'SUPERNOVA';
-                }
+        if(currentScene === 'VORTEX') {
+    let angle = 0.15; // Tăng tốc độ xoay để tạo cảm giác gấp gáp
+    let oldX = g.x;
+    
+    // Tối ưu toán học: Dùng hệ số 0.92 để các sao tụ vào tâm nhanh và dứt khoát hơn
+    g.x = (g.x * Math.cos(angle) - g.y * Math.sin(angle)) * 0.92;
+    g.y = (oldX * Math.sin(angle) + g.y * Math.cos(angle)) * 0.92;
+    
+    shake = 30; // Tạo độ rung mạnh dần
+
+    // Điểm mấu chốt: Khi sao đã sát tâm (khoảng cách < 1px), kích hoạt nổ ngay để giải phóng bộ nhớ
+    if(Math.abs(g.x) < 1) {
+        currentScene = 'SUPERNOVA';
+        shake = 0; // Tắt rung để chuẩn bị cho màn hình trắng xóa
+    }
+}
                 // Ngôi sao bay dần về vị trí chữ 10A1
                 s.x += (g.x - s.x) * 0.08; 
                 s.y += (g.y - s.y) * 0.08; 
@@ -222,22 +226,25 @@ function showPrivateContent(g) {
 }
 
 function closePortal() {
-    // 1. Ẩn toàn bộ cái bảng thông báo đi
-    document.getElementById('scene-unlock').classList.add('hidden');
-    
-    // 2. Reset lại giao diện bên trong bảng để lần sau mở bạn khác không bị lộ ảnh cũ
-    document.getElementById('lock-section').style.display = 'block';
-    document.getElementById('private-view').style.display = 'none';
-    document.getElementById('girl-pass').value = "";
+    const unlockScene = document.getElementById('scene-unlock');
+    const privateView = document.getElementById('private-view');
+    const lockSection = document.getElementById('lock-section');
 
-    // 3. Kiểm tra xem 30 bạn đã "unlocked" hết chưa (Bước 9 trong kế hoạch)
-    const allUnlocked = girls.every(g => g.unlocked === true);
+    // 1. Ẩn toàn bộ UI Popup
+    unlockScene.classList.add('hidden');
     
-    if(allUnlocked) {
-        // Nếu đủ 30 người, chờ 1 giây rồi bắt đầu xoáy tụ (Vortex)
-        setTimeout(() => { 
-            currentScene = 'VORTEX'; 
-        }, 1000);
+    // 2. Trì hoãn việc reset một chút để mượt mắt (sau khi hiệu ứng fade out xong)
+    setTimeout(() => {
+        privateView.classList.add('hidden'); // Dùng class hidden thay vì .style.display
+        privateView.style.display = 'none';
+        lockSection.style.display = 'block';
+        document.getElementById('girl-pass').value = "";
+    }, 500);
+
+    // 3. Logic kích hoạt Vortex (Chỉ chạy khi đủ 30 bạn)
+    const unlockedCount = girls.filter(g => g.unlocked).length;
+    if(unlockedCount >= 30 && currentScene !== 'VORTEX') {
+        setTimeout(() => { currentScene = 'VORTEX'; }, 1000);
     }
 }
 
