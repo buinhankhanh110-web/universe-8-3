@@ -9,25 +9,24 @@
 
 body{
 margin:0;
-background:black;
 overflow:hidden;
+background:black;
 font-family:Arial;
 }
 
-/* ===== PASSWORD SCREEN ===== */
+/* LOGIN */
 
 #login{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
 background:black;
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
+flex-direction:column;
 color:white;
+z-index:10;
 }
 
 #login input{
@@ -39,34 +38,45 @@ margin-top:10px;
 #login button{
 margin-top:10px;
 padding:8px 20px;
-font-size:16px;
 cursor:pointer;
 }
 
-/* ===== SPACE ===== */
+/* SPACE */
 
 #space{
 display:none;
+position:fixed;
+width:100%;
+height:100%;
 }
 
-/* ===== STAR ===== */
+/* BACKGROUND CANVAS */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+}
+
+/* STAR */
 
 .star{
 position:absolute;
-width:30px;
-height:30px;
+width:60px;
+height:60px;
 border-radius:50%;
-background:white;
-box-shadow:0 0 15px white;
+background-size:cover;
+background-position:center;
+box-shadow:0 0 20px white;
 cursor:pointer;
 transition:transform .3s;
 }
 
 .star:hover{
-transform:scale(1.3);
+transform:scale(1.2);
 }
 
-/* ===== ZOOM MODE ===== */
+/* ZOOM MODE */
 
 #focus{
 position:fixed;
@@ -79,22 +89,28 @@ display:none;
 justify-content:center;
 align-items:center;
 flex-direction:column;
+z-index:5;
 }
 
-#focus img{
-width:200px;
-height:200px;
+#focusStar{
+width:250px;
+height:250px;
 border-radius:50%;
+background-size:cover;
+background-position:center;
+box-shadow:0 0 40px white;
 margin-bottom:20px;
 }
 
-#focus h2{
+#focusName{
 color:white;
+font-size:28px;
 }
 
 #focus button{
 margin-top:20px;
-padding:8px 20px;
+padding:10px 20px;
+cursor:pointer;
 }
 
 </style>
@@ -106,34 +122,44 @@ padding:8px 20px;
 <!-- LOGIN -->
 
 <div id="login">
+
 <h1>Nhập mật khẩu để vào vũ trụ</h1>
+
 <input type="password" id="pass">
+
 <button onclick="login()">Vào</button>
+
 </div>
 
 <!-- SPACE -->
 
-<div id="space"></div>
+<div id="space">
+<canvas id="bg"></canvas>
+</div>
 
-<!-- FOCUS VIEW -->
+<!-- ZOOM VIEW -->
 
 <div id="focus">
-<img id="girlImg">
-<h2 id="girlName"></h2>
+
+<div id="focusStar"></div>
+
+<div id="focusName"></div>
+
 <button onclick="closeFocus()">Quay lại</button>
+
 </div>
 
 <script>
 
-/* ===== PASSWORD ===== */
+/* PASSWORD */
 
 let password="123456"
 
 function login(){
 
-let input=document.getElementById("pass").value
+let p=document.getElementById("pass").value
 
-if(input===password){
+if(p===password){
 
 document.getElementById("login").style.display="none"
 document.getElementById("space").style.display="block"
@@ -148,32 +174,72 @@ alert("Sai mật khẩu")
 
 }
 
-/* ===== DATA ===== */
+/* CANVAS BACKGROUND */
+
+let canvas=document.getElementById("bg")
+let ctx=canvas.getContext("2d")
+
+function resize(){
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+}
+
+resize()
+
+window.addEventListener("resize",resize)
+
+let bgStars=[]
+
+for(let i=0;i<200;i++){
+
+bgStars.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+speed:0.2+Math.random()*0.4
+
+})
+
+}
+
+function drawSpace(){
+
+ctx.fillStyle="#020412"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+bgStars.forEach(s=>{
+
+s.y+=s.speed
+
+if(s.y>canvas.height)s.y=0
+
+ctx.beginPath()
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2)
+ctx.fillStyle="white"
+ctx.fill()
+
+})
+
+requestAnimationFrame(drawSpace)
+
+}
+
+drawSpace()
+
+/* DATA */
 
 let girls=[
-{
-name:"Linh",
-img:"linh.jpg"
-},
-{
-name:"Mai",
-img:"mai.jpg"
-},
-{
-name:"Trang",
-img:"trang.jpg"
-},
-{
-name:"Vy",
-img:"vy.jpg"
-},
-{
-name:"Ngọc",
-img:"ngoc.jpg"
-}
+
+{name:"Linh",img:"linh.jpg"},
+{name:"Mai",img:"mai.jpg"},
+{name:"Trang",img:"trang.jpg"},
+{name:"Vy",img:"vy.jpg"},
+{name:"Ngọc",img:"ngoc.jpg"}
+
 ]
 
-/* ===== CREATE STARS ===== */
+/* SPAWN STARS */
 
 function spawnStars(){
 
@@ -185,34 +251,70 @@ let star=document.createElement("div")
 
 star.className="star"
 
-let x=Math.random()*window.innerWidth
-let y=Math.random()*window.innerHeight
+star.style.backgroundImage="url("+g.img+")"
 
-star.style.left=x+"px"
-star.style.top=y+"px"
+/* spawn từ rìa */
 
-star.onclick=()=>{
-focusStar(g)
+let side=Math.floor(Math.random()*4)
+
+let startX,startY
+
+if(side===0){
+startX=Math.random()*window.innerWidth
+startY=-100
 }
 
+if(side===1){
+startX=window.innerWidth+100
+startY=Math.random()*window.innerHeight
+}
+
+if(side===2){
+startX=Math.random()*window.innerWidth
+startY=window.innerHeight+100
+}
+
+if(side===3){
+startX=-100
+startY=Math.random()*window.innerHeight
+}
+
+let finalX=Math.random()*window.innerWidth
+let finalY=Math.random()*window.innerHeight
+
+star.style.left=startX+"px"
+star.style.top=startY+"px"
+
+star.style.transition="all 2s"
+
 space.appendChild(star)
+
+setTimeout(()=>{
+
+star.style.left=finalX+"px"
+star.style.top=finalY+"px"
+
+},50)
+
+star.onclick=()=>focusStar(g)
 
 })
 
 }
 
-/* ===== ZOOM ===== */
+/* FOCUS */
 
-function focusStar(girl){
+function focusStar(g){
 
 document.getElementById("focus").style.display="flex"
 
-document.getElementById("girlImg").src=girl.img
-document.getElementById("girlName").innerText=girl.name
+document.getElementById("focusStar").style.backgroundImage="url("+g.img+")"
+
+document.getElementById("focusName").innerText=g.name
 
 }
 
-/* ===== CLOSE ===== */
+/* CLOSE */
 
 function closeFocus(){
 
