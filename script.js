@@ -101,17 +101,17 @@ function draw() {
 
         if((currentScene === 'CONSTELLATION' || currentScene === 'VORTEX') && i < 30) {
             let girl = girls[i];
-          if(currentScene === 'VORTEX') {
-    let angle = 0.15;
+         if(currentScene === 'VORTEX') {
+    let angle = 0.2; // Tăng tốc độ xoay
     let oldX = girl.x;
-    // Hút vào tâm với tốc độ nhanh dần
-    girl.x = (girl.x * Math.cos(angle) - girl.y * Math.sin(angle)) * 0.92;
-    girl.y = (oldX * Math.sin(angle) + girl.y * Math.cos(angle)) * 0.92;
+    // Hút vào tâm cực nhanh để tránh vón cục
+    girl.x = (girl.x * Math.cos(angle) - girl.y * Math.sin(angle)) * 0.88; 
+    girl.y = (oldX * Math.sin(angle) + girl.y * Math.cos(angle)) * 0.88;
     
-    shake = 30;
+    shake = 40; // Rung mạnh hơn để che đi sự vón cục
 
-    // Chỉ cần các sao vào gần tâm (dưới 2px) là kích nổ luôn
-    if(Math.abs(girl.x) < 2 && Math.abs(girl.y) < 2) {
+    // Chỉ cần vào gần tâm là KÍCH NỔ NGAY, không chờ đợi
+    if(Math.abs(girl.x) < 5) {
         currentScene = 'SUPERNOVA';
     }
 }
@@ -138,17 +138,22 @@ function draw() {
 
     ctx.restore();
 
-    if(currentScene === 'SUPERNOVA') {
-        overlayOpacity += 0.015;
-        ctx.fillStyle = `rgba(255, 255, 255, ${overlayOpacity})`;
-        ctx.fillRect(0, 0, w, h);
-        if(overlayOpacity >= 1) {
-            cancelAnimationFrame(draw);
-            document.getElementById('scene-teacher').classList.remove('hidden');
-        }
-    } else { requestAnimationFrame(draw); }
-}
+   if(currentScene === 'SUPERNOVA') {
+    speed = 0; // Dừng mọi chuyển động sao để giải phóng CPU
+    overlayOpacity += 0.025; // Tăng tốc độ trắng hóa màn hình
+    
+    ctx.globalCompositeOperation = 'source-over'; // Ép vẽ đè lên mọi thứ
+    ctx.fillStyle = `rgba(255, 255, 255, ${overlayOpacity})`;
+    ctx.fillRect(0, 0, w, h);
 
+    if(overlayOpacity >= 1) {
+        cancelAnimationFrame(draw); // Dừng hẳn vòng lặp vẽ
+        // Hiện trang của Cô giáo ngay lập tức
+        const teacherScene = document.getElementById('scene-teacher');
+        teacherScene.classList.remove('hidden');
+        teacherScene.style.opacity = 1; 
+    }
+}
 // ==========================================
 // 4. LOGIC ĐIỀU KHIỂN (HẾT LỖI KẸT)
 // ==========================================
