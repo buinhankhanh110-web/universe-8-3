@@ -1,496 +1,87 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<title>Galaxy 10A1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GALAXY 10A1 - THE TRIBUTE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; position: absolute; inset: 0; z-index: 1; }
 
-<style>
+        /* --- CỔNG KHÔNG GIAN (PHASE 1) --- */
+        #gate-container {
+            position: fixed; inset: 0; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle at center, #001a1a 0%, #000 100%);
+            transition: 1.5s;
+        }
+        .radar-scan {
+            width: 200px; height: 200px; border-radius: 50%;
+            border: 2px solid rgba(0, 242, 255, 0.3);
+            position: relative; margin-bottom: 40px;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+        }
+        .radar-scan::after {
+            content: ''; position: absolute; inset: 0;
+            border-radius: 50%; border-top: 2px solid #00f2ff;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-body{
-margin:0;
-overflow:hidden;
-background:black;
-font-family:Segoe UI;
-color:white;
-}
+        .main-title { font-family: 'Orbitron'; font-size: 3.5rem; color: #fff; letter-spacing: 10px; text-shadow: 0 0 20px #00f2ff; text-align: center; }
+        .input-group { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        input { background: rgba(255,255,255,0.1); border: 1px solid #00f2ff; color: #fff; padding: 12px 25px; border-radius: 25px; text-align: center; font-family: 'Orbitron'; outline: none; }
+        .btn-launch { padding: 12px 40px; background: #00f2ff; color: #000; border: none; border-radius: 25px; font-family: 'Orbitron'; font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px #00f2ff; }
+        .btn-launch:hover { transform: scale(1.1); box-shadow: 0 0 40px #00f2ff; }
 
-/* GATEWAY UI */
+        /* --- MODAL LỜI CHÚC (PHASE 3) --- */
+        #wish-modal {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(0, 10, 20, 0.85); border: 1px solid #00f2ff; padding: 40px;
+            width: 350px; border-radius: 20px; color: white; text-align: center;
+            opacity: 0; pointer-events: none; transition: 0.5s; z-index: 1000;
+            backdrop-filter: blur(10px); box-shadow: 0 0 30px rgba(0,242,255,0.3);
+        }
+        #wish-modal.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+        #wish-modal h2 { font-family: 'Orbitron'; color: #00f2ff; margin-bottom: 20px; }
 
-#gateway{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-text-align:center;
-z-index:10;
-}
+        /* --- TRANG CUỐI CỦA CÔ (PHASE 4) --- */
+        #teacher-part {
+            position: fixed; inset: 0; z-index: 2000; display: flex; 
+            flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle, #1a001a 0%, #000 100%); 
+            color: #fff; opacity: 0; pointer-events: none; transition: 2s; text-align: center; padding: 40px;
+        }
+        #teacher-part.show { opacity: 1; pointer-events: auto; }
+        #typewriter-msg { font-size: 1.4rem; line-height: 1.8; max-width: 700px; margin: 30px 0; min-height: 150px; }
 
-input{
-padding:10px;
-font-size:18px;
-border-radius:6px;
-border:none;
-}
-
-button{
-padding:10px 20px;
-font-size:18px;
-border:none;
-border-radius:6px;
-background:cyan;
-cursor:pointer;
-margin-left:10px;
-}
-
-/* MODAL */
-
-#modal{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-display:none;
-justify-content:center;
-align-items:center;
-background:rgba(0,0,0,0.4);
-backdrop-filter:blur(12px);
-z-index:20;
-}
-
-#modalBox{
-background:rgba(255,255,255,0.1);
-border:1px solid rgba(255,255,255,0.25);
-padding:40px;
-border-radius:20px;
-max-width:420px;
-text-align:center;
-}
-
-#modalName{
-font-size:24px;
-color:cyan;
-margin-bottom:10px;
-}
-
-/* FINAL PAGE */
-
-#teacherPage{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-text-align:center;
-width:70%;
-font-size:28px;
-}
-
-</style>
+        .hidden { opacity: 0 !important; visibility: hidden; }
+    </style>
 </head>
-
 <body>
-
-<div id="gateway">
-<h2>CONSTELLATION 10A1</h2>
-<input id="code" placeholder="Enter Code">
-<button onclick="engage()">ENGAGE</button>
-</div>
-
-<div id="modal">
-<div id="modalBox">
-<div id="modalName"></div>
-<div id="modalText"></div>
-<br>
-<button onclick="closeModal()">TIẾP TỤC KHÁM PHÁ</button>
-</div>
-</div>
-
-<div id="teacherPage"></div>
-
-<canvas id="c"></canvas>
-
-<script>
-
-const canvas=document.getElementById("c")
-const ctx=canvas.getContext("2d")
-
-canvas.width=innerWidth
-canvas.height=innerHeight
-
-/* PHASE */
-
-let phase="GATEWAY"
-
-/* DATA */
-
-const girlsData=[
-{name:"Bạn 1",msg:"Chúc bạn luôn tỏa sáng như ngôi sao."},
-{name:"Bạn 2",msg:"Chúc bạn luôn vui vẻ và hạnh phúc."},
-{name:"Bạn 3",msg:"Chúc bạn thành công trên mọi hành trình."},
-{name:"Bạn 4",msg:"Luôn mạnh mẽ và tự tin nhé."},
-{name:"Bạn 5",msg:"Bạn là ánh sao rực rỡ của 10A1."},
-{name:"Bạn 6",msg:"Chúc bạn luôn đạt được ước mơ."},
-{name:"Bạn 7",msg:"Chúc bạn thật nhiều niềm vui."},
-{name:"Bạn 8",msg:"Luôn xinh đẹp và tỏa sáng."},
-{name:"Bạn 9",msg:"Bạn là một phần tuyệt vời của lớp."},
-{name:"Bạn 10",msg:"Chúc bạn thành công."},
-{name:"Bạn 11",msg:"Chúc bạn thật nhiều năng lượng."},
-{name:"Bạn 12",msg:"Chúc bạn luôn vui."},
-{name:"Bạn 13",msg:"Bạn là ngôi sao của lớp."},
-{name:"Bạn 14",msg:"Chúc bạn luôn mạnh mẽ."},
-{name:"Bạn 15",msg:"Chúc bạn thật nhiều may mắn."},
-{name:"Bạn 16",msg:"Bạn luôn tuyệt vời."},
-{name:"Bạn 17",msg:"Chúc bạn thành công."},
-{name:"Bạn 18",msg:"Chúc bạn nhiều niềm vui."},
-{name:"Bạn 19",msg:"Bạn luôn tỏa sáng."},
-{name:"Bạn 20",msg:"Chúc bạn đạt mọi ước mơ."},
-{name:"Bạn 21",msg:"Chúc bạn hạnh phúc."},
-{name:"Bạn 22",msg:"Chúc bạn rực rỡ."},
-{name:"Bạn 23",msg:"Chúc bạn vui vẻ."},
-{name:"Bạn 24",msg:"Chúc bạn bình an."},
-{name:"Bạn 25",msg:"Chúc bạn hạnh phúc."},
-{name:"Bạn 26",msg:"Chúc bạn thật nhiều năng lượng."},
-{name:"Bạn 27",msg:"Chúc bạn luôn tỏa sáng."},
-{name:"Bạn 28",msg:"Chúc bạn thật tuyệt vời."},
-{name:"Bạn 29",msg:"Chúc bạn thành công."},
-{name:"Bạn 30",msg:"Chúc bạn luôn vui vẻ."}
-]
-
-const teacherData={
-title:"GỬI CÔ CHỦ NHIỆM TÂM HUYẾT",
-msg:"Cô không chỉ dạy chúng em kiến thức, mà còn dạy chúng em cách trưởng thành. Tập thể 10A1 xin cảm ơn cô vì sự tận tâm, kiên nhẫn và tình yêu thương mà cô dành cho chúng em."
-}
-
-/* STARS */
-
-let bgStars=[]
-for(let i=0;i<500;i++){
-bgStars.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height
-})
-}
-
-/* CONSTELLATION */
-
-let stars=[]
-let removed=0
-
-function createConstellation(){
-
-let startX=canvas.width/2-250
-let startY=canvas.height/2-80
-
-let coords=[]
-
-/* 10A1 pattern */
-
-for(let i=0;i<10;i++) coords.push({x:startX+i*50,y:startY})
-for(let i=0;i<10;i++) coords.push({x:startX+i*50,y:startY+80})
-for(let i=0;i<10;i++) coords.push({x:startX+i*50,y:startY+160})
-
-coords.forEach((p,i)=>{
-
-stars.push({
-x:p.x,
-y:p.y,
-baseX:p.x,
-baseY:p.y,
-data:girlsData[i],
-alive:true,
-pulse:Math.random()*10
-})
-
-})
-
-}
-
-/* PARTICLES */
-
-let particles=[]
-
-function createExplosion(x,y,count){
-
-for(let i=0;i<count;i++){
-
-particles.push({
-x,y,
-vx:(Math.random()-0.5)*10,
-vy:(Math.random()-0.5)*10,
-life:1
-})
-
-}
-
-}
-
-/* GATEWAY */
-
-function engage(){
-
-if(document.getElementById("code").value==="83"){
-
-document.getElementById("gateway").style.display="none"
-phase="SUCTION"
-
-}
-
-}
-
-/* MODAL */
-
-let currentStar=null
-
-function openModal(star){
-
-currentStar=star
-
-document.getElementById("modalName").innerText=star.data.name
-document.getElementById("modalText").innerText=star.data.msg
-
-document.getElementById("modal").style.display="flex"
-
-}
-
-function closeModal(){
-
-document.getElementById("modal").style.display="none"
-
-currentStar.alive=false
-
-createExplosion(currentStar.x,currentStar.y,30)
-
-removed++
-
-if(removed===30){
-
-setTimeout(()=>{
-stars=[]
-createConstellation()
-phase="VORTEX"
-},800)
-
-}
-
-}
-
-/* CLICK */
-
-canvas.onclick=e=>{
-
-if(phase!=="EXPLORE") return
-
-let rect=canvas.getBoundingClientRect()
-let x=e.clientX-rect.left
-let y=e.clientY-rect.top
-
-stars.forEach(s=>{
-
-if(!s.alive) return
-
-if(Math.hypot(x-s.x,y-s.y)<20){
-openModal(s)
-}
-
-})
-
-}
-
-/* TYPEWRITER */
-
-let isTyping=false
-
-function typeWriter(text){
-
-if(isTyping) return
-isTyping=true
-
-let i=0
-let el=document.getElementById("teacherPage")
-
-function type(){
-
-if(i<text.length){
-
-el.innerHTML+=text[i]
-i++
-
-setTimeout(type,40)
-
-}
-
-}
-
-type()
-
-}
-
-/* LOOP */
-
-let vortexAngle=0
-
-function animate(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-switch(phase){
-
-case "GATEWAY":
-
-bgStars.forEach(s=>{
-ctx.fillStyle="white"
-ctx.fillRect(s.x,s.y,1,1)
-})
-
-ctx.strokeStyle="cyan"
-ctx.beginPath()
-ctx.arc(canvas.width/2,canvas.height/2,70,0,Math.PI*2)
-ctx.stroke()
-
-break
-
-case "SUCTION":
-
-bgStars.forEach(s=>{
-s.x+=(canvas.width/2-s.x)*0.1
-s.y+=(canvas.height/2-s.y)*0.1
-ctx.fillRect(s.x,s.y,1,1)
-})
-
-setTimeout(()=>phase="WARP",1000)
-
-break
-
-case "WARP":
-
-bgStars.forEach(s=>{
-
-let dx=s.x-canvas.width/2
-let dy=s.y-canvas.height/2
-
-s.x+=dx*0.1
-s.y+=dy*0.1
-
-ctx.beginPath()
-ctx.moveTo(s.x,s.y)
-ctx.lineTo(s.x-dx*0.1,s.y-dy*0.1)
-ctx.strokeStyle="white"
-ctx.stroke()
-
-})
-
-setTimeout(()=>{
-createConstellation()
-phase="EXPLORE"
-},2500)
-
-break
-
-case "EXPLORE":
-
-stars.forEach(s=>{
-
-if(!s.alive) return
-
-s.pulse+=0.05
-
-s.x=s.baseX+Math.sin(s.pulse)*4
-s.y=s.baseY+Math.cos(s.pulse)*4
-
-let g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,20)
-
-g.addColorStop(0,"white")
-g.addColorStop(0.3,"cyan")
-g.addColorStop(1,"transparent")
-
-ctx.fillStyle=g
-ctx.beginPath()
-ctx.arc(s.x,s.y,20,0,Math.PI*2)
-ctx.fill()
-
-})
-
-break
-
-case "VORTEX":
-
-let cx=canvas.width/2
-let cy=canvas.height/2
-
-vortexAngle+=0.05
-
-stars.forEach((s,i)=>{
-
-s.baseX=cx+Math.cos(vortexAngle+i)*200
-s.baseY=cy+Math.sin(vortexAngle+i)*200
-
-s.baseX+=(cx-s.baseX)*0.05
-s.baseY+=(cy-s.baseY)*0.05
-
-ctx.fillStyle="white"
-ctx.beginPath()
-ctx.arc(s.baseX,s.baseY,3,0,Math.PI*2)
-ctx.fill()
-
-})
-
-if(Math.abs(stars[0].baseX-cx)<5){
-
-phase="BIGBANG"
-
-createExplosion(cx,cy,1000)
-
-}
-
-break
-
-case "BIGBANG":
-
-particles.forEach(p=>{
-
-p.vx*=0.96
-p.vy*=0.96
-
-p.x+=p.vx
-p.y+=p.vy
-
-p.life-=0.01
-
-ctx.globalAlpha=p.life
-ctx.fillStyle=["magenta","cyan","gold"][Math.floor(Math.random()*3)]
-
-ctx.fillRect(p.x,p.y,2,2)
-
-ctx.globalAlpha=1
-
-})
-
-particles=particles.filter(p=>p.life>0)
-
-if(particles.length===0){
-
-document.body.style.background="#3c0b5f"
-
-phase="TEACHER"
-
-document.getElementById("teacherPage").innerHTML=
-"<h2>"+teacherData.title+"</h2><br>"
-
-typeWriter(teacherData.msg)
-
-}
-
-break
-
-}
-
-requestAnimationFrame(animate)
-
-}
-
-animate()
-
-</script>
-
-</body>
+    <canvas id="universe"></canvas>
+    
+    <div id="gate-container">
+        <div class="radar-scan"></div>
+        <h1 class="main-title">GALAXY 10A1</h1>
+        <div class="input-group">
+            <input type="password" id="pass" placeholder="MẬT MÃ 8/3">
+            <button class="btn-launch" onclick="Galaxy.ignite()">ENGAGE</button>
+        </div>
+    </div>
+
+    <div id="wish-modal">
+        <h2 id="dispName"></h2>
+        <p id="dispWish"></p>
+        <button class="btn-launch" style="margin-top:25px; font-size: 0.8rem;" onclick="Galaxy.closeModal()">TIẾP TỤC KHÁM PHÁ</button>
+    </div>
+
+    <div id="teacher-part">
+        <h1 id="typewriter-title" style="font-family:'Orbitron'; font-size:3rem; color:#f0f; text-shadow:0 0 20px #f0f"></h1>
+        <p id="typewriter-msg"></p>
+        <button class="btn-launch" style="background:#f0f; box-shadow: 0 0 20px #f0f" onclick="location.reload()">KHỞI TẠO VŨ TRỤ</button>
+    </div>
+
+    </body>
 </html>
