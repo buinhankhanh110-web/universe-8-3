@@ -2,264 +2,268 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>10A1 - The Ultimate Cosmic Journey</title>
+    <title>10A1 - Cinematic Cosmic Journey</title>
     <style>
-        :root {
-            --primary-cyan: #00ffff;
-            --deep-space: #00050a;
-            --star-white: #ffffff;
-            --neon-pink: #ff00ff;
-        }
-
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--deep-space); font-family: 'Segoe UI', Roboto, sans-serif; }
-        canvas { display: block; position: absolute; top: 0; left: 0; }
-
-        /* UI Styling */
-        #ui-container {
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
+        canvas { display: block; filter: contrast(120%) brightness(110%); }
+        
+        /* Giao diện UI Cinematic */
+        #overlay {
             position: fixed; inset: 0; z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle, rgba(0,20,40,0.2) 0%, rgba(0,0,0,0.9) 100%);
-            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.8) 100%);
+            transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hero-title {
+            color: #fff; font-size: 6vw; font-weight: 100; letter-spacing: 30px;
+            text-transform: uppercase; margin: 0; 
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            animation: breathe 4s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { opacity: 0.6; letter-spacing: 25px; filter: blur(2px); }
+            50% { opacity: 1; letter-spacing: 35px; filter: blur(0); }
         }
 
-        .title-wrapper { text-align: center; margin-bottom: 50px; }
-        .main-title {
-            color: var(--star-white); font-size: 5rem; font-weight: 900; letter-spacing: 20px;
-            text-shadow: 0 0 20px var(--primary-cyan), 0 0 40px var(--primary-cyan);
-            margin: 0; animation: titleFloat 3s ease-in-out infinite;
+        .input-wrapper { margin-top: 50px; position: relative; }
+        input {
+            background: transparent; border: 1px solid rgba(0,255,255,0.3);
+            border-radius: 2px; color: #fff; padding: 15px 40px; width: 300px;
+            font-size: 1rem; text-align: center; outline: none;
+            letter-spacing: 5px; transition: 0.5s;
+            backdrop-filter: blur(10px);
         }
+        input:focus { border-color: #0ff; box-shadow: 0 0 20px rgba(0,255,255,0.2); }
 
-        @keyframes titleFloat {
-            0%, 100% { transform: translateY(0); filter: brightness(1); }
-            50% { transform: translateY(-10px); filter: brightness(1.3); }
+        .btn-warp {
+            margin-top: 40px; background: #fff; color: #000; border: none;
+            padding: 20px 80px; font-weight: 900; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 5px;
+            transition: 0.5s; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
         }
+        .btn-warp:hover { background: #0ff; transform: scale(1.1); box-shadow: 0 0 50px #0ff; }
 
-        .input-group { position: relative; margin-bottom: 30px; }
-        .cosmic-input {
-            background: rgba(255, 255, 255, 0.05); border: 2px solid var(--primary-cyan);
-            border-radius: 50px; color: white; padding: 15px 40px; width: 280px;
-            font-size: 1.2rem; text-align: center; outline: none;
-            backdrop-filter: blur(5px); transition: 0.3s;
+        /* Card chúc mừng sang trọng */
+        #msg-card {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 200; width: 400px; padding: 60px; text-align: center;
+            background: rgba(0,0,0,0.9); border: 1px solid rgba(0,255,255,0.2);
+            color: #fff; opacity: 0; pointer-events: none; transition: 0.8s;
+            backdrop-filter: blur(20px);
         }
-        .cosmic-input:focus { box-shadow: 0 0 30px rgba(0, 255, 255, 0.4); background: rgba(255, 255, 255, 0.1); }
+        #msg-card.show { opacity: 1; pointer-events: auto; }
+        .name { font-size: 3rem; font-weight: 200; color: #0ff; margin-bottom: 20px; letter-spacing: 10px; }
+        .wish { font-size: 1.2rem; line-height: 2; opacity: 0.8; font-weight: 300; }
 
-        .btn-launch {
-            background: var(--primary-cyan); color: black; border: none;
-            padding: 18px 60px; border-radius: 50px; font-weight: bold;
-            font-size: 1.3rem; cursor: pointer; letter-spacing: 3px;
-            box-shadow: 0 0 20px var(--primary-cyan); transition: 0.4s;
-        }
-        .btn-launch:hover { transform: scale(1.1) rotate(1deg); box-shadow: 0 0 50px var(--star-white); }
-
-        /* Card Information */
-        #detail-card {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
-            z-index: 200; width: 450px; padding: 40px; border-radius: 30px;
-            background: linear-gradient(135deg, rgba(10, 25, 45, 0.95), rgba(25, 10, 35, 0.95));
-            border: 1px solid var(--primary-cyan); color: white; text-align: center;
-            opacity: 0; pointer-events: none; transition: 0.5s;
-        }
-        #detail-card.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
-        .card-name { font-size: 3rem; color: var(--primary-cyan); margin-bottom: 15px; }
-        .card-wish { font-size: 1.4rem; line-height: 1.6; font-style: italic; color: #ddd; }
-
-        .hidden { opacity: 0 !important; pointer-events: none !important; transform: scale(1.5) !important; }
+        .hidden { opacity: 0 !important; }
     </style>
 </head>
 <body>
 
-<canvas id="mainCanvas"></canvas>
+<canvas id="c"></canvas>
 
-<div id="ui-container">
-    <div class="title-wrapper">
-        <h1 class="main-title">GALAXY 10A1</h1>
-        <p style="color: var(--primary-cyan); letter-spacing: 5px; margin-top: 10px;">A COSMIC TRIBUTE TO OUR GIRLS</p>
+<div id="overlay">
+    <h1 class="hero-title">10A1 COSMIC</h1>
+    <div class="input-wrapper">
+        <input type="password" id="p" placeholder="ACCESS CODE">
     </div>
-    <div class="input-group">
-        <input type="password" id="passkey" class="cosmic-input" placeholder="MẬT MÃ KHÔNG GIAN (83)">
-    </div>
-    <button class="btn-launch" onclick="Universe.startWarp()">KHỞI ĐỘNG VŨ TRỤ</button>
+    <button class="btn-warp" onclick="U.ignite()">Engage Warp</button>
 </div>
 
-<div id="detail-card" onclick="Universe.closeCard()">
-    <div class="card-name" id="gName"></div>
-    <div class="card-wish" id="gWish"></div>
-    <div style="margin-top: 30px; font-size: 0.8rem; opacity: 0.5;">[ CHẠM ĐỂ ĐÓNG ]</div>
+<div id="msg-card" onclick="this.className=''">
+    <div class="name" id="gn"></div>
+    <div class="wish" id="gw"></div>
 </div>
 
 <script>
 /**
- * UNIVERSE ENGINE v5.0 - PRO EDITION
+ * CINEMATIC GALAXY ENGINE - HIGH FIDELITY
  */
-const girlsData = [
-    {n: "Bảo Ngọc", w: "Ngọc quý 10A1, luôn tỏa sáng nhé!"}, {n: "Hà Phương", w: "Dịu dàng như nắng ban mai."},
-    {n: "Tuyết Mai", w: "Xinh đẹp kiên cường như nhành Mai."}, {n: "Diệp Chi", w: "Mãi rạng rỡ và tràn đầy sức sống."},
-    {n: "Khánh Huyền", w: "Nụ cười của Huyền là đẹp nhất."}, {n: "Ngọc Lan", w: "Hương thơm dịu ngọt của cả lớp."},
-    {n: "Phương Thảo", w: "Mọi sự bình an luôn đến với em."}, {n: "Thu Hà", w: "Trong trẻo như mùa thu Hà Nội."},
-    {n: "Hà Chi", w: "Cá tính và tỏa sáng rực rỡ nhé."}, {n: "Thùy Linh", w: "Hạnh phúc luôn nở hoa trên môi."},
-    {n: "Huyền Trang", w: "Xinh đẹp, giỏi giang và đầy tự tin."}, {n: "Phương Linh", w: "Chúc em vạn sự như ý."},
-    {n: "Quỳnh Anh", w: "Kiêu sa như đóa hoa Quỳnh."}, {n: "Mai Hương", w: "Mãi giữ nét duyên thầm này nhé."},
-    {n: "Hà My", w: "Cô gái nhỏ đáng yêu nhất quả đất."}, {n: "Lan Anh", w: "Tỏa sáng rực rỡ mỗi ngày."},
-    {n: "Thùy Dương", w: "Ấm áp và tràn đầy yêu thương."}, {n: "Yến Nhi", w: "Bay cao với ước mơ của mình."},
-    {n: "Bảo Quyên", w: "Xinh đẹp và vô cùng trang nhã."}, {n: "Huyền Diệu", w: "Cuộc sống sẽ luôn kỳ diệu với em."},
-    {n: "Trúc Mai", w: "Mạnh mẽ và đầy khí chất."}, {n: "Tú Anh", w: "Thông minh, xinh đẹp, rạng ngời."},
-    {n: "Ngọc Mai", w: "Quý giá như chính cái tên của em."}, {n: "Hoàng Yến", w: "Luôn vui tươi như chú chim nhỏ."},
-    {n: "Ngọc Diệp", w: "Lá ngọc cành vàng của 10A1."}, {n: "Hương Giang", w: "Êm đềm và sâu sắc như dòng sông."},
-    {n: "Bảo Chi", w: "Trân trọng từng phút giây hạnh phúc."}, {n: "Mai Phương", w: "Đích đến rạng rỡ đang chờ em."},
-    {n: "Hồng Nhung", w: "Đóa hoa hồng rực rỡ nhất."}, {n: "Hoài Thương", w: "Đáng yêu và được mọi người quý mến."}
+const girls = [
+    {n:"Bảo Ngọc", w:"Viên ngọc quý tỏa sáng nhất hệ sao 10A1."}, {n:"Hà Phương", w:"Dịu dàng như dải ngân hà tĩnh lặng."},
+    {n:"Tuyết Mai", w:"Xinh đẹp kiên cường như vì tinh tú."}, {n:"Diệp Chi", w:"Mầm sống xanh giữa vũ trụ bao la."},
+    {n:"Khánh Huyền", w:"Nụ cười mang ánh sáng đến mọi hành tinh."}, {n:"Ngọc Lan", w:"Hương thơm vĩnh cửu trong không gian."},
+    {n:"Phương Thảo", w:"Cỏ thơm mọc giữa những vì sao may mắn."}, {n:"Thu Hà", w:"Trong trẻo như ánh trăng rằm."},
+    {n:"Hà Chi", w:"Tỏa sáng rực rỡ theo cách riêng biệt."}, {n:"Thùy Linh", w:"Hạnh phúc là hành trình em đang đi."},
+    {n:"Huyền Trang", w:"Xinh đẹp và bí ẩn như những tinh vân."}, {n:"Phương Linh", w:"Chúc em có một thanh xuân rực rỡ."},
+    {n:"Quỳnh Anh", w:"Đóa hoa quỳnh nở giữa ngàn sao đêm."}, {n:"Mai Hương", w:"Mãi giữ nét duyên dáng thanh tao này."},
+    {n:"Hà My", w:"Đáng yêu nhất vũ trụ 10A1 này luôn!"}, {n:"Lan Anh", w:"Ánh sáng rực rỡ dẫn lối thành công."},
+    {n:"Thùy Dương", w:"Ấm áp như tia nắng mặt trời ban mai."}, {n:"Yến Nhi", w:"Chấp cánh bay xa đến những thiên hà mới."},
+    {n:"Bảo Quyên", w:"Xinh đẹp, tinh tế và đầy chiều sâu."}, {n:"Huyền Diệu", w:"Mọi điều kỳ diệu sẽ đến với em."},
+    {n:"Trúc Mai", w:"Khí chất thanh cao giữa vạn vật."}, {n:"Tú Anh", w:"Thông minh và rạng ngời như sao Bắc Đẩu."},
+    {n:"Ngọc Mai", w:"Viên ngọc quý giá không thể thay thế."}, {n:"Hoàng Yến", w:"Vui tươi như chú chim nhỏ giữa rừng sao."},
+    {n:"Ngọc Diệp", w:"Lá ngọc cành vàng của cả tập thể."}, {n:"Hương Giang", w:"Mềm mại và sâu sắc như dòng ngân hà."},
+    {n:"Bảo Chi", w:"Quý giá và luôn ngập tràn yêu thương."}, {n:"Mai Phương", w:"Tương lai rạng ngời đang chờ đợi em."},
+    {n:"Hồng Nhung", w:"Kiêu sa và rực rỡ như đóa hồng nhung."}, {n:"Hoài Thương", w:"Cô gái ngọt ngào ai cũng hâm mộ."}
 ];
 
-class Meteor {
-    constructor(w, h) { this.w = w; this.h = h; this.reset(); }
-    reset() {
-        this.x = Math.random() * this.w * 1.5;
-        this.y = -100;
-        this.size = Math.random() * 2 + 1;
-        this.speed = Math.random() * 15 + 10;
-        this.len = Math.random() * 150 + 50;
-        this.opacity = 0;
-    }
-    update() {
-        this.x -= this.speed;
-        this.y += this.speed;
-        if (this.x < -this.len || this.y > this.h + this.len) this.reset();
-    }
-    draw(ctx) {
-        ctx.save();
-        let grad = ctx.createLinearGradient(this.x, this.y, this.x + this.len, this.y - this.len);
-        grad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-        grad.addColorStop(1, 'transparent');
-        ctx.strokeStyle = grad;
-        ctx.lineWidth = this.size;
-        ctx.beginPath(); ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x + this.len, this.y - this.len); ctx.stroke();
-        ctx.restore();
-    }
-}
+const U = {
+    canvas: document.getElementById('c'),
+    ctx: null, stars: [], nebulae: [], constellation: [],
+    speed: 0.2, targetSpeed: 0.2, warpFactor: 0,
+    shake: 0, time: 0,
 
-const Universe = {
-    canvas: document.getElementById('mainCanvas'),
-    stars: [], meteors: [], constellationStars: [],
-    speed: 1, targetSpeed: 1, warping: false,
-    
     init() {
         this.ctx = this.canvas.getContext('2d');
         this.resize();
-        for(let i=0; i<1800; i++) this.stars.push({
-            x: Math.random() * this.w - this.w/2,
-            y: Math.random() * this.h - this.h/2,
-            z: Math.random() * this.w, pz: 0
+        // Tạo sao nền đa tầng
+        for(let i=0; i<2000; i++) this.stars.push({
+            x: Math.random()*this.w - this.w/2,
+            y: Math.random()*this.h - this.h/2,
+            z: Math.random()*this.w,
+            color: Math.random() > 0.8 ? '#aabbee' : '#fff'
         });
-        for(let i=0; i<5; i++) this.meteors.push(new Meteor(this.w, this.h));
+        // Tạo tinh vân mờ ảo
+        for(let i=0; i<15; i++) this.nebulae.push({
+            x: Math.random()*this.w, y: Math.random()*this.h,
+            r: Math.random()*400 + 200,
+            c: `hsla(${Math.random()*40 + 180}, 70%, 10%, 0.1)`
+        });
         this.animate();
-        window.addEventListener('resize', () => this.resize());
+        window.onresize = () => this.resize();
     },
 
     resize() { this.w = this.canvas.width = window.innerWidth; this.h = this.canvas.height = window.innerHeight; },
 
-    startWarp() {
-        if(document.getElementById('passkey').value !== "83") return alert("Mật mã: 83");
-        document.getElementById('ui-container').classList.add('hidden');
-        this.warping = true;
-        this.targetSpeed = 55;
-        setTimeout(() => this.endWarp(), 2500);
+    ignite() {
+        if(document.getElementById('p').value !== "83") return alert("ACCESS DENIED (83)");
+        document.getElementById('overlay').className = 'hidden';
+        this.targetSpeed = 60;
+        this.warpFactor = 0;
+        // Bắt đầu rung màn hình khi đạt tốc độ cao
+        let s = setInterval(() => {
+            this.warpFactor += 0.02;
+            if(this.warpFactor >= 1) {
+                clearInterval(s);
+                setTimeout(() => this.drop(), 2000);
+            }
+        }, 50);
     },
 
-    endWarp() {
-        this.targetSpeed = 0.5;
-        setTimeout(() => {
-            this.warping = false;
-            this.createConstellation();
-        }, 2000);
+    drop() {
+        this.targetSpeed = 0.3;
+        this.warpFactor = 0;
+        setTimeout(() => this.formConstellation(), 1500);
     },
 
-    createConstellation() {
-        const cx = this.w/2, cy = this.h/2, s = Math.min(this.w, this.h) / 10;
-        const pts = [
+    formConstellation() {
+        const cx = this.w/2, cy = this.h/2, gap = Math.min(this.w, this.h) / 8;
+        // Tọa độ 10A1 Cinematic
+        const p = [
             // 1
-            {x:cx-4*s, y:cy-1.5*s}, {x:cx-4*s, y:cy}, {x:cx-4*s, y:cy+1.5*s},
+            {x:cx-3.5*gap, y:cy-1.5*gap}, {x:cx-3.5*gap, y:cy}, {x:cx-3.5*gap, y:cy+1.5*gap},
             // 0
-            {x:cx-2.5*s, y:cy-1.5*s}, {x:cx-1*s, y:cy-1.5*s}, {x:cx-1*s, y:cy+1.5*s}, {x:cx-2.5*s, y:cy+1.5*s}, {x:cx-2.5*s, y:cy}, {x:cx-1*s, y:cy},
+            {x:cx-2*gap, y:cy-1.5*gap}, {x:cx-1*gap, y:cy-1.5*gap}, {x:cx-0.5*gap, y:cy-0.5*gap}, {x:cx-0.5*gap, y:cy+0.5*gap}, {x:cx-1*gap, y:cy+1.5*gap}, {x:cx-2*gap, y:cy+1.5*gap}, {x:cx-2.5*gap, y:cy+0.5*gap}, {x:cx-2.5*gap, y:cy-0.5*gap},
             // A
-            {x:cx+0.5*s, y:cy+1.5*s}, {x:cx+1.2*s, y:cy-1.5*s}, {x:cx+1.9*s, y:cy+1.5*s}, {x:cx+0.8*s, y:cy+0.2*s}, {x:cx+1.6*s, y:cy+0.2*s},
+            {x:cx+1*gap, y:cy+1.5*gap}, {x:cx+1.5*gap, y:cy-0.5*gap}, {x:cx+2*gap, y:cy-1.5*gap}, {x:cx+2.5*gap, y:cy-0.5*gap}, {x:cx+3*gap, y:cy+1.5*gap}, {x:cx+1.4*gap, y:cy+0.3*gap}, {x:cx+2.6*gap, y:cy+0.3*gap},
             // 1
-            {x:cx+3.4*s, y:cy-1.5*s}, {x:cx+3.4*s, y:cy}, {x:cx+3.4*s, y:cy+1.5*s}
+            {x:cx+4.2*gap, y:cy-1.5*gap}, {x:cx+4.2*gap, y:cy}, {x:cx+4.2*gap, y:cy+1.5*gap}
         ];
         
-        this.constellationStars = girlsData.map((g, i) => {
-            let target = pts[i % pts.length];
-            return { ...g, x: target.x, y: target.y, ox: target.x, oy: target.y, a: Math.random()*6, glow: 0 };
+        this.constellation = girls.map((g, i) => {
+            let target = p[i % p.length];
+            return { ...g, x: target.x, y: target.y, ox: target.x, oy: target.y, a: Math.random()*Math.PI*2 };
         });
 
         this.canvas.onclick = (e) => {
-            this.constellationStars.forEach(s => {
-                if(Math.hypot(e.clientX - s.x, e.clientY - s.y) < 30) {
-                    document.getElementById('gName').innerText = s.n;
-                    document.getElementById('gWish').innerText = s.w;
-                    document.getElementById('detail-card').classList.add('active');
+            this.constellation.forEach(s => {
+                if(Math.hypot(e.clientX - s.x, e.clientY - s.y) < 25) {
+                    document.getElementById('gn').innerText = s.n;
+                    document.getElementById('gw').innerText = s.w;
+                    document.getElementById('msg-card').className = 'show';
                 }
             });
         };
     },
 
-    closeCard() { document.getElementById('detail-card').classList.remove('active'); },
-
     animate() {
-        // Tinh chỉnh tốc độ mượt mà
+        this.time += 0.01;
         this.speed += (this.targetSpeed - this.speed) * 0.05;
-        
-        // Vẽ nền vũ trụ sâu
-        let grad = this.ctx.createRadialGradient(this.w/2, this.h/2, 0, this.w/2, this.h/2, this.w);
-        grad.addColorStop(0, '#001020'); grad.addColorStop(1, '#000000');
-        this.ctx.fillStyle = grad; this.ctx.fillRect(0, 0, this.w, this.h);
+        this.shake = this.speed > 30 ? (Math.random()-0.5) * 5 : 0;
 
-        // Sao băng
-        if(this.speed < 10) this.meteors.forEach(m => { m.update(); m.draw(this.ctx); });
+        // Background Gradient
+        let g = this.ctx.createRadialGradient(this.w/2, this.h/2, 0, this.w/2, this.h/2, this.w);
+        g.addColorStop(0, '#000810'); g.addColorStop(1, '#000');
+        this.ctx.fillStyle = g;
+        this.ctx.fillRect(0, 0, this.w, this.h);
 
-        // Hyper-space stars
-        this.stars.forEach(s => {
-            s.pz = s.z; s.z -= this.speed;
-            if(s.z < 1) { s.z = this.w; s.pz = s.z; }
-            let sx = (s.x / s.z) * this.w + this.w/2;
-            let sy = (s.y / s.z) * this.h + this.h/2;
-            let px = (s.x / s.pz) * this.w + this.w/2;
-            let py = (s.y / s.pz) * this.h + this.h/2;
-
-            this.ctx.strokeStyle = `rgba(255, 255, 255, ${Math.min(1, 1 - s.z/this.w)})`;
-            this.ctx.lineWidth = (1 - s.z/this.w) * 2;
-            this.ctx.beginPath(); this.ctx.moveTo(px, py); this.ctx.lineTo(sx, sy); this.ctx.stroke();
+        // Vẽ tinh vân Nebula
+        this.nebulae.forEach(n => {
+            this.ctx.globalAlpha = 0.3;
+            let ng = this.ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            ng.addColorStop(0, n.c); ng.addColorStop(1, 'transparent');
+            this.ctx.fillStyle = ng;
+            this.ctx.fillRect(n.x-n.r, n.y-n.r, n.r*2, n.r*2);
+            this.ctx.globalAlpha = 1;
         });
 
-        // Constellation 10A1
-        if(this.constellationStars.length > 0 && this.speed < 2) {
-            this.ctx.beginPath();
-            this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
-            // Vẽ đường nối
-            for(let i=0; i<this.constellationStars.length-1; i++) {
-                let s1 = this.constellationStars[i], s2 = this.constellationStars[i+1];
-                if(Math.hypot(s1.ox-s2.ox, s1.oy-s2.oy) < 120) {
-                    this.ctx.moveTo(s1.x, s1.y); this.ctx.lineTo(s2.x, s2.y);
-                }
-            }
-            this.ctx.stroke();
+        // Vẽ sao Hyper-space (Cinematic Version)
+        this.stars.forEach(s => {
+            s.z -= this.speed;
+            if(s.z < 1) s.z = this.w;
 
-            this.constellationStars.forEach(s => {
-                s.a += 0.04;
-                s.x = s.ox + Math.sin(s.a)*5;
-                s.y = s.oy + Math.cos(s.a)*5;
-                
-                this.ctx.shadowBlur = 15; this.ctx.shadowColor = "#0ff";
+            let sx = (s.x / s.z) * this.w + this.w/2 + this.shake;
+            let sy = (s.y / s.z) * this.h + this.h/2 + this.shake;
+            
+            let size = (1 - s.z/this.w) * 2;
+            let alpha = (1 - s.z/this.w);
+
+            this.ctx.fillStyle = s.color;
+            this.ctx.globalAlpha = alpha;
+
+            if(this.speed > 10) {
+                // Hiệu ứng vệt sáng Cinematic kéo dài về tâm
+                this.ctx.strokeStyle = s.color;
+                this.ctx.lineWidth = size;
+                this.ctx.beginPath();
+                this.ctx.moveTo(sx, sy);
+                let pz = s.z + this.speed * 2;
+                let px = (s.x / pz) * this.w + this.w/2;
+                let py = (s.y / pz) * this.h + this.h/2;
+                this.ctx.lineTo(px, py);
+                this.ctx.stroke();
+            } else {
+                this.ctx.beginPath();
+                this.ctx.arc(sx, sy, size, 0, 7);
+                this.ctx.fill();
+            }
+        });
+
+        // Vẽ chòm sao 10A1
+        if(this.constellation.length > 0 && this.speed < 2) {
+            this.ctx.globalAlpha = 1;
+            this.ctx.strokeStyle = 'rgba(0, 255, 255, 0.1)';
+            this.ctx.beginPath();
+            this.constellation.forEach((s, i) => {
+                s.a += 0.02;
+                s.x = s.ox + Math.sin(s.a) * 5;
+                s.y = s.oy + Math.cos(s.a) * 5;
+
+                // Bloom Effect cho từng ngôi sao
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = "#0ff";
                 this.ctx.fillStyle = "#fff";
-                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, 4, 0, Math.PI*2); this.ctx.fill();
+                this.ctx.beginPath();
+                this.ctx.arc(s.x, s.y, 3, 0, 7);
+                this.ctx.fill();
                 this.ctx.shadowBlur = 0;
+
+                // Vẽ đường nối thanh mảnh
+                if(i > 0 && i < 20) {
+                    this.ctx.moveTo(this.constellation[i-1].x, this.constellation[i-1].y);
+                    this.ctx.lineTo(s.x, s.y);
+                }
             });
+            this.ctx.stroke();
         }
 
         requestAnimationFrame(() => this.animate());
     }
 };
 
-Universe.init();
+U.init();
 </script>
 </body>
 </html>
