@@ -12,8 +12,12 @@
     <div id="scene-login" class="ui-container">
         <div class="glass-card">
             <h1>10A1 PORTAL</h1>
-            <p style="opacity: 0.6; font-size: 0.8rem; margin-bottom: 20px;">HÀNH TRÌNH KHÁM PHÁ VŨ TRỤ 10A1</p>
-            <input type="password" id="main-pass" placeholder="MẬT KHẨU LỚP">
+            <p style="opacity: 0.6; font-size: 0.8rem; margin-bottom: 25px; letter-spacing: 2px;">
+                HÀNH TRÌNH KHÁM PHÁ VŨ TRỤ 10A1
+            </p>
+            <div class="input-wrapper">
+                <input type="password" id="main-pass" placeholder="MẬT KHẨU LỚP">
+            </div>
             <button onclick="startJourney()">KÍCH HOẠT</button>
         </div>
     </div>
@@ -34,7 +38,9 @@
                 <div class="canva-container">
                     <img id="canva-img" src="" alt="Canva Design">
                 </div>
-                <button onclick="closePortal()" style="background: white; color: black;">HOÀN TẤT</button>
+                <button onclick="closePortal()" style="background: white; color: black; margin-top: 10px;">
+                    HOÀN TẤT
+                </button>
             </div>
         </div>
     </div>
@@ -42,9 +48,15 @@
     <div id="scene-teacher" class="ui-container hidden teacher-theme">
         <div class="teacher-content">
             <h1 style="color: #000; letter-spacing: 5px;">GỬI CÔ GIÁO</h1>
-            <p style="font-size: 1.2rem; max-width: 600px;">"Cô là ngôi sao dẫn đường cho tập thể 10A1 tỏa sáng."</p>
-            <p style="font-weight: bold; margin-top: 30px;">CHÚC CÔ 8/3 HẠNH PHÚC & RẠNG RỠ!</p>
-            <button onclick="location.reload()" style="background: black; color: white;">QUAY LẠI VŨ TRỤ</button>
+            <p style="font-size: 1.3rem; line-height: 1.6; max-width: 600px; color: #333;">
+                "Cô là ngôi sao dẫn đường cho tập thể 10A1 tỏa sáng rực rỡ nhất."
+            </p>
+            <div style="margin: 40px 0;">
+                <p style="font-weight: bold; font-size: 1.1rem;">CHÚC CÔ 8/3 HẠNH PHÚC & RẠNG RỠ!</p>
+            </div>
+            <button onclick="location.reload()" style="background: #000; color: #fff;">
+                QUAY LẠI VŨ TRỤ
+            </button>
         </div>
     </div>
 
