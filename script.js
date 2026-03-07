@@ -222,9 +222,19 @@ function showPrivateContent(g) {
 }
 
 function closePortal() {
+    // 1. Ẩn toàn bộ cái bảng thông báo đi
     document.getElementById('scene-unlock').classList.add('hidden');
-    // Kiểm tra nếu tất cả 30 bạn đã được mở khóa (Bước 9)
-    if(girls.every(g => g.unlocked)) {
+    
+    // 2. Reset lại giao diện bên trong bảng để lần sau mở bạn khác không bị lộ ảnh cũ
+    document.getElementById('lock-section').style.display = 'block';
+    document.getElementById('private-view').style.display = 'none';
+    document.getElementById('girl-pass').value = "";
+
+    // 3. Kiểm tra xem 30 bạn đã "unlocked" hết chưa (Bước 9 trong kế hoạch)
+    const allUnlocked = girls.every(g => g.unlocked === true);
+    
+    if(allUnlocked) {
+        // Nếu đủ 30 người, chờ 1 giây rồi bắt đầu xoáy tụ (Vortex)
         setTimeout(() => { 
             currentScene = 'VORTEX'; 
         }, 1000);
