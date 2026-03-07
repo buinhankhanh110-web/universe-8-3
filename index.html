@@ -3,188 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universe 10A1 - International Women's Day</title>
+    <title>Universe 10A1 - 8/3 Special</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', Arial, sans-serif; }
-        canvas { position: absolute; top: 0; left: 0; display: block; }
+        body, html { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        canvas { position: absolute; top: 0; left: 0; }
         
         .ui-layer { 
             position: absolute; z-index: 10; width: 100%; height: 100%; 
             display: flex; justify-content: center; align-items: center; 
-            transition: all 1s ease-in-out; color: white;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1); color: white;
         }
+        .hidden { opacity: 0; pointer-events: none; transform: scale(1.1); }
 
-        .hidden { opacity: 0; pointer-events: none; visibility: hidden; }
-
-        /* Login Box */
+        /* Login Portal - Glassmorphism style */
         .glass-card { 
-            background: rgba(255, 255, 255, 0.1); padding: 40px; 
-            border-radius: 20px; backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255,255,255,0.2); text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            background: rgba(255, 255, 255, 0.05); padding: 50px; 
+            border-radius: 20px; backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255,255,255,0.1); text-align: center;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.1);
         }
-
         input { 
-            background: transparent; border: 1px solid #fff; color: white; 
-            padding: 12px; border-radius: 8px; outline: none; width: 200px;
-            font-size: 16px; margin: 10px 0;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); 
+            color: white; padding: 15px; border-radius: 10px; outline: none; 
+            width: 250px; font-size: 18px; text-align: center; margin-bottom: 20px;
         }
-
         button { 
-            background: #fff; color: #000; border: none; padding: 12px 25px; 
-            border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;
+            background: linear-gradient(45deg, #00d4ff, #ff0080); color: white; 
+            border: none; padding: 15px 40px; border-radius: 10px; 
+            cursor: pointer; font-weight: bold; letter-spacing: 2px;
         }
 
-        button:hover { background: #00d4ff; transform: scale(1.05); }
-
-        /* Profile Modal */
-        #profile-modal { 
-            background: rgba(0,0,0,0.85); flex-direction: column; text-align: center;
-        }
-        .profile-content { max-width: 500px; animation: scaleUp 0.5s ease; }
-        @keyframes scaleUp { from {transform: scale(0.8); opacity: 0;} to {transform: scale(1); opacity: 1;} }
-
-        /* Teacher Page */
-        #scene-teacher { background: white; color: black; flex-direction: column; text-align: center; }
+        /* Modal cho từng bạn nữ */
+        #profile-modal { background: rgba(0,0,0,0.9); }
+        .content { text-align: center; max-width: 600px; padding: 20px; }
+        h2 { font-size: 3rem; margin: 0; color: #ff0080; text-shadow: 0 0 20px rgba(255,0,128,0.5); }
     </style>
 </head>
 <body>
 
-    <canvas id="universe"></canvas>
+<canvas id="universe"></canvas>
 
-    <div id="scene-login" class="ui-layer">
-        <div class="glass-card">
-            <h1 style="letter-spacing: 5px;">PORTAL 10A1</h1>
-            <p>Nhập mã để kích hoạt hành trình vũ trụ</p>
-            <input type="password" id="main-pass" placeholder="Mật khẩu lớp...">
-            <br>
-            <button onclick="checkLogin()">KÍCH HOẠT</button>
-        </div>
+<div id="scene-login" class="ui-layer">
+    <div class="glass-card">
+        <h1 style="letter-spacing: 10px; font-weight: 300;">10A1 PORTAL</h1>
+        <input type="password" id="main-pass" placeholder="MẬT KHẨU LỚP">
+        <br>
+        <button onclick="checkLogin()">KÍCH HOẠT HÀNH TRÌNH</button>
     </div>
+</div>
 
-    <div id="profile-modal" class="ui-layer hidden">
-        <div class="profile-content">
-            <h1 id="girl-name" style="color: #00d4ff; font-size: 3rem; margin-bottom: 10px;"></h1>
-            <p id="girl-wish" style="font-size: 1.2rem; line-height: 1.6; font-style: italic;"></p>
-            <br>
-            <button onclick="closeProfile()">TRỞ LẠI VŨ TRỤ</button>
-        </div>
+<div id="profile-modal" class="ui-layer hidden">
+    <div class="content">
+        <h2 id="g-name"></h2>
+        <p id="g-wish" style="font-size: 1.4rem; line-height: 1.8; color: #ddd;"></p>
+        <button onclick="closeProfile()" style="margin-top: 30px; background: white; color: black;">QUAY LẠI</button>
     </div>
+</div>
 
-    <div id="scene-teacher" class="ui-layer hidden">
-        <h1 style="font-size: 3.5rem; margin-bottom: 20px; background: linear-gradient(45deg, #ff0080, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            GỬI CÔ GIÁO CỦA CHÚNG EM
-        </h1>
-        <p style="font-size: 1.5rem; max-width: 800px; padding: 0 20px;">
-            "Một ngôi sao không thể làm nên bầu trời đêm, nhưng Cô là ngôi sao dẫn đường giúp tập thể 10A1 tỏa sáng nhất."
-        </p>
-        <p style="margin-top: 40px; font-weight: bold;">CHÚC CÔ 8/3 HẠNH PHÚC & RẠNG RỠ</p>
-    </div>
+<div id="scene-teacher" class="ui-layer hidden" style="background: white; color: black; flex-direction: column;">
+    <h1 style="font-size: 4rem;">GỬI CÔ GIÁO</h1>
+    <p style="max-width: 700px; font-size: 1.5rem; text-align: center;">"Cô là ngôi sao dẫn đường cho tập thể 10A1 tỏa sáng."</p>
+</div>
 
-    <script>
-   const canvas = document.getElementById('universe');
+<script>
+const canvas = document.getElementById('universe');
 const ctx = canvas.getContext('2d');
-let w, h, stars = [];
-let currentScene = 'LOGIN'; // LOGIN, WARP, CONSTELLATION, COLLAPSE, SUPERNOVA
-let speed = 0.5;
-let viewedCount = 0;
-let isSupernova = false;
-let supernovaSize = 0;
+let w, h, stars = [], currentScene = 'IDLE';
+let speed = 0.2, warpFactor = 0, viewedCount = 0;
+let nebulaOpacity = 0;
 
-// DỮ LIỆU 30 BẠN NỮ (Ông hãy điền tên và mật khẩu thực tế vào đây)
-const girlsData = Array.from({ length: 30 }, (_, i) => ({
-    id: i,
-    name: `Bạn nữ ${i + 1}`,
-    pass: `123`, // Mật khẩu riêng từng bạn
-    wish: `Chúc bạn một ngày 8/3 thật ý nghĩa, luôn xinh đẹp và học tốt trong tập thể 10A1!`,
-    active: true,
-    targetX: 0,
-    targetY: 0
+// Dữ liệu 30 bạn (Ông tự điền vào đây nhé)
+const girls = Array.from({length: 30}, (_, i) => ({
+    name: `Bạn nữ ${i+1}`, pass: "123", wish: "8/3 vui vẻ rạng ngời!", 
+    active: true, tx: 0, ty: 0
 }));
 
-// KHỞI TẠO VŨ TRỤ
 function init() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
     stars = [];
-    for (let i = 0; i < 400; i++) {
+    for(let i=0; i<500; i++) {
         stars.push({
-            x: Math.random() * w - w / 2,
-            y: Math.random() * h - h / 2,
-            z: Math.random() * w,
-            px: 0, py: 0,
-            color: `hsl(${Math.random() * 360}, 70%, 80%)`
+            x: Math.random()*w-w/2, y: Math.random()*h-h/2, z: Math.random()*w,
+            px: 0, py: 0, 
+            hue: Math.random() < 0.8 ? 200 : Math.random()*360 // Đa số là màu xanh
         });
     }
-    setup10A1Layout();
-}
-
-// CẢNH 3: TẠO TỌA ĐỘ CHỮ 10A1
-function setup10A1Layout() {
-    const spacing = 50;
-    const startX = -300;
-    // Đơn giản hóa: Xếp thành hàng ngang hoặc hình khối tùy chỉnh
-    girlsData.forEach((g, i) => {
-        g.targetX = startX + (i % 10) * 70;
-        g.targetY = Math.floor(i / 10) * 80 - 100;
+    // Setup vị trí chữ 10A1
+    girls.forEach((g, i) => {
+        g.tx = (i % 10) * 80 - 360;
+        g.ty = Math.floor(i / 10) * 100 - 100;
     });
 }
 
-// VÒNG LẶP VẼ CHÍNH
 function draw() {
-    ctx.fillStyle = isSupernova ? 'white' : 'rgba(0, 0, 0, 0.15)';
+    // Nền Nebula mờ ảo
+    ctx.fillStyle = `rgba(0, 0, 5, ${currentScene === 'WARP' ? 0.2 : 1})`;
     ctx.fillRect(0, 0, w, h);
 
-    if (currentScene === 'SUPERNOVA') {
-        drawSupernova();
-        return;
-    }
+    if (currentScene === 'WARP') drawNebulaFlash();
 
     ctx.save();
-    ctx.translate(w / 2, h / 2);
+    ctx.translate(w/2, h/2);
 
     stars.forEach((s, i) => {
-        let x, y;
+        s.z -= speed;
+        if(s.z <= 0) s.z = w;
 
-        if (currentScene === 'CONSTELLATION' || currentScene === 'COLLAPSE') {
-            if (i < girlsData.length) {
-                const g = girlsData[i];
-                if (currentScene === 'COLLAPSE') {
-                    // CẢNH 8: COLLAPSE (Hút vào tâm)
-                    g.targetX *= 0.85;
-                    g.targetY *= 0.85;
-                    if (Math.abs(g.targetX) < 1) currentScene = 'SUPERNOVA';
-                }
-                
-                s.x += (g.targetX - s.x) * 0.08;
-                s.y += (g.targetY - s.y) * 0.08;
-                s.z = 1000;
-                x = s.x; y = s.y;
+        let x = s.x * (w/s.z);
+        let y = s.y * (h/s.z);
 
-                // Vẽ ngôi sao đặc biệt đại diện cho các bạn nữ
-                if (g.active) {
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
-                    ctx.fillStyle = '#00d4ff';
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = '#00d4ff';
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                }
-            } else {
-                // Các sao nền mờ đi
-                s.z -= 0.1;
-                x = s.x * (w / s.z);
-                y = s.y * (h / s.z);
-                drawStar(x, y, s);
-            }
+        if(currentScene === 'CONSTELLATION' && i < 30) {
+            let g = girls[i];
+            s.x += (g.tx - s.x) * 0.05;
+            s.y += (g.ty - s.y) * 0.05;
+            s.z = 1000;
+            if(g.active) drawStar(s.x, s.y, 4, '#00d4ff', true);
         } else {
-            // CẢNH 2: WARP / HYPERSPACE
-            s.z -= speed;
-            if (s.z <= 0) s.z = w;
-            x = s.x * (w / s.z);
-            y = s.y * (h / s.z);
-            drawStar(x, y, s);
+            let trail = (currentScene === 'WARP') ? warpFactor : 1;
+            ctx.beginPath();
+            ctx.strokeStyle = `hsla(${s.hue}, 80%, 80%, ${1 - s.z/w})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(x, y);
+            ctx.lineTo(s.px * trail, s.py * trail);
+            ctx.stroke();
         }
         s.px = x; s.py = y;
     });
@@ -193,88 +135,82 @@ function draw() {
     requestAnimationFrame(draw);
 }
 
-function drawStar(x, y, s) {
+function drawStar(x, y, r, color, glow) {
     ctx.beginPath();
-    ctx.strokeStyle = currentScene === 'WARP' ? 'white' : 'rgba(255,255,255,0.3)';
-    ctx.lineWidth = 1;
-    ctx.moveTo(x, y);
-    ctx.lineTo(s.px, s.py);
-    ctx.stroke();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    if(glow) {
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = color;
+    }
+    ctx.fill();
+    ctx.shadowBlur = 0;
 }
 
-// LOGIC XỬ LÝ HÀNH TRÌNH
+function drawNebulaFlash() {
+    let grad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w);
+    grad.addColorStop(0, `rgba(255, 0, 128, ${nebulaOpacity})`);
+    grad.addColorStop(0.5, `rgba(0, 212, 255, ${nebulaOpacity*0.5})`);
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+}
+
 function checkLogin() {
-    const p = document.getElementById('main-pass').value;
-    if (p === '10A1') { // Mật khẩu chung của lớp
+    if(document.getElementById('main-pass').value === '10A1') {
         document.getElementById('scene-login').classList.add('hidden');
         currentScene = 'WARP';
-        let accel = setInterval(() => {
-            speed += 1;
-            if (speed > 45) {
-                clearInterval(accel);
-                setTimeout(() => { 
+        // Hiệu ứng tăng tốc mượt mà
+        let interval = setInterval(() => {
+            speed += 2;
+            warpFactor = 1.2;
+            nebulaOpacity += 0.02;
+            if(speed > 60) {
+                clearInterval(interval);
+                setTimeout(() => {
                     currentScene = 'CONSTELLATION';
-                    speed = 0.5;
-                }, 3000);
+                    speed = 0.2;
+                    nebulaOpacity = 0;
+                }, 2000);
             }
         }, 50);
     }
 }
 
-// CLICK VÀO SAO (CẢNH 4)
 canvas.addEventListener('click', (e) => {
-    if (currentScene !== 'CONSTELLATION') return;
-    const mx = e.clientX - w / 2;
-    const my = e.clientY - h / 2;
-
-    girlsData.forEach(g => {
-        const d = Math.sqrt((mx - g.targetX) ** 2 + (my - g.targetY) ** 2);
-        if (d < 20 && g.active) {
-            openProfile(g);
+    if(currentScene !== 'CONSTELLATION') return;
+    girls.forEach(g => {
+        let dx = e.clientX - w/2 - g.tx;
+        let dy = e.clientY - h/2 - g.ty;
+        if(Math.sqrt(dx*dx + dy*dy) < 30 && g.active) {
+            let p = prompt(`Mật khẩu của ${g.name}:`);
+            if(p === g.pass) {
+                document.getElementById('g-name').innerText = g.name;
+                document.getElementById('g-wish').innerText = g.wish;
+                document.getElementById('profile-modal').classList.remove('hidden');
+                window.cur = g;
+            }
         }
     });
 });
 
-function openProfile(g) {
-    const p = prompt(`Mật khẩu riêng của ${g.name}:`);
-    if (p === g.pass) {
-        document.getElementById('girl-name').innerText = g.name;
-        document.getElementById('girl-wish').innerText = g.wish;
-        document.getElementById('profile-modal').classList.remove('hidden');
-        window.currentViewingGirl = g;
-    }
-}
-
 function closeProfile() {
     document.getElementById('profile-modal').classList.add('hidden');
-    if (window.currentViewingGirl) {
-        window.currentViewingGirl.active = false;
-        viewedCount++;
-        // Khi tất cả đã xem (Phần 7)
-        if (viewedCount >= girlsData.length) {
+    window.cur.active = false;
+    viewedCount++;
+    if(viewedCount >= 30) {
+        // Supernova & Teacher Page
+        setTimeout(() => {
+            currentScene = 'WARP';
+            speed = 100;
             setTimeout(() => {
-                girlsData.forEach(g => g.active = true); // Hiện lại tất cả sao
-                setTimeout(() => { currentScene = 'COLLAPSE'; }, 1000);
-            }, 1000);
-        }
+                document.getElementById('scene-teacher').classList.remove('hidden');
+            }, 2000);
+        }, 1000);
     }
 }
 
-function drawSupernova() {
-    supernovaSize += 40;
-    ctx.beginPath();
-    ctx.arc(w / 2, h / 2, supernovaSize, 0, Math.PI * 2);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    if (supernovaSize > w * 1.2) {
-        isSupernova = false;
-        document.getElementById('scene-teacher').classList.remove('hidden');
-    } else {
-        requestAnimationFrame(draw);
-    }
-}
-
-window.addEventListener('resize', init);
+window.onresize = init;
 init();
 draw();
 </script>
