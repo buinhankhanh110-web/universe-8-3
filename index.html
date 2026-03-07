@@ -1,277 +1,458 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>10A1 GALAXY - THE FINAL CHAPTER</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap');
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
-        canvas { display: block; position: absolute; inset: 0; }
+<meta charset="UTF-8">
+<title>Galaxy 10A1</title>
 
-        /* --- UI LAYER --- */
-        #gate-container {
-            position: fixed; inset: 0; z-index: 100;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, #001a1a 0%, #000 100%);
-            transition: 1.5s;
-        }
+<style>
 
-        .energy-orb {
-            width: 180px; height: 180px; border-radius: 50%; border: 2px solid #00f2ff;
-            box-shadow: 0 0 50px #00f2ff; margin-bottom: 40px;
-            animation: orbPulse 3s infinite ease-in-out;
-        }
+body{
+margin:0;
+overflow:hidden;
+background:black;
+font-family:Arial;
+color:white;
+}
 
-        .main-title { font-family: 'Orbitron'; font-size: 4rem; color: #fff; letter-spacing: 15px; text-shadow: 0 0 20px #00f2ff; }
+/* EVENT HORIZON UI */
 
-        .btn-launch {
-            margin-top: 40px; padding: 15px 50px; background: #fff; border-radius: 30px;
-            font-family: 'Orbitron'; font-weight: 900; cursor: pointer; transition: 0.4s;
-        }
+#gateway{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+text-align:center;
+z-index:5;
+}
 
-        /* --- MODAL LỜI CHÚC --- */
-        #wish-modal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
-            background: rgba(0, 10, 20, 0.95); border: 1px solid #00f2ff; padding: 40px;
-            width: 350px; border-radius: 20px; color: white; text-align: center;
-            opacity: 0; pointer-events: none; transition: 0.5s; z-index: 1000;
-        }
-        #wish-modal.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+input{
+padding:10px;
+font-size:18px;
+border:none;
+outline:none;
+border-radius:6px;
+}
 
-        /* --- HIỆU ỨNG VỤ NỔ (WHITE OUT) --- */
-        #big-bang-overlay {
-            position: fixed; inset: 0; background: white; opacity: 0;
-            pointer-events: none; z-index: 2000; transition: opacity 0.3s;
-        }
+button{
+padding:10px 20px;
+font-size:18px;
+margin-left:10px;
+cursor:pointer;
+border:none;
+border-radius:6px;
+background:cyan;
+}
 
-        /* --- PHẦN CÔ GIÁO --- */
-        #teacher-part {
-            position: fixed; inset: 0; z-index: 2500; display: flex; 
-            flex-direction: column; justify-content: center; align-items: center;
-            background: #000; color: #ff00ff; opacity: 0; pointer-events: none;
-            transition: 2s; text-align: center;
-        }
-        #teacher-part.show { opacity: 1; pointer-events: auto; }
+/* MODAL */
 
-        .hidden { opacity: 0 !important; visibility: hidden; }
-        @keyframes orbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-    </style>
+#modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+display:none;
+justify-content:center;
+align-items:center;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(10px);
+z-index:10;
+}
+
+#modalContent{
+background:rgba(255,255,255,0.1);
+border:1px solid rgba(255,255,255,0.2);
+padding:40px;
+border-radius:20px;
+max-width:400px;
+text-align:center;
+}
+
+/* FINALE MESSAGE */
+
+#message{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+font-size:32px;
+text-align:center;
+width:70%;
+}
+
+</style>
 </head>
+
 <body>
 
-<canvas id="universe"></canvas>
-<div id="big-bang-overlay"></div>
-
-<div id="gate-container">
-    <div class="energy-orb"></div>
-    <h1 class="main-title">GALAXY 10A1</h1>
-    <input type="password" id="pass" style="padding:10px; border-radius:10px; text-align:center" placeholder="PASS: 83">
-    <button class="btn-launch" onclick="Galaxy.ignite()">ENGAGE</button>
+<div id="gateway">
+<h2>ENTER CODE</h2>
+<input id="code">
+<button onclick="engage()">ENGAGE</button>
 </div>
 
-<div id="wish-modal">
-    <h2 id="dispName" style="color:#00f2ff; font-family:'Orbitron'"></h2>
-    <p id="dispWish" style="font-style:italic"></p>
-    <button onclick="Galaxy.closeModal()" style="margin-top:20px">TIẾP TỤC KHÁM PHÁ</button>
+<div id="modal">
+<div id="modalContent">
+<p id="wish"></p>
+<button onclick="closeModal()">Close</button>
+</div>
 </div>
 
-<div id="teacher-part">
-    <h1 id="typewriter-title" style="font-family:'Orbitron'; font-size:4rem; text-shadow:0 0 30px #f0f"></h1>
-    <p id="typewriter-msg" style="font-size:1.5rem; color:#fff; max-width:600px; min-height: 100px; margin: 20px 0;"></p>
-    <button onclick="location.reload()" style="background:#f0f; color:#fff; border:none; padding:15px 40px; cursor:pointer; font-family:'Orbitron'; margin-top:30px">KHỞI TẠO LẠI VŨ TRỤ</button>
-</div>
+<div id="message"></div>
+
+<canvas id="c"></canvas>
 
 <script>
-/** * SIÊU HỆ THỐNG GALAXY - XƯƠNG SỐNG CHI TIẾT 
- */
-const girlsData = Array.from({length: 30}, (_, i) => ({
-    id: i, n: `Bạn Nữ ${i+1}`, w: `Chúc bạn ngày 8/3 rạng rỡ như ngôi sao thứ ${i+1}!`, clicked: false
-}));
 
-const Galaxy = {
-    canvas: document.getElementById('universe'),
-    stars: [], constellation: [], 
-    speed: 0.8, targetSpeed: 0.8,
-    viewedCount: 0, 
-    phase: 'IDLE', // IDLE, WARP, EXPLORE, REBIRTH, BIGBANG
+const canvas = document.getElementById("c")
+const ctx = canvas.getContext("2d")
 
-    init() {
-        this.ctx = this.canvas.getContext('2d');
-        this.resize();
-        for(let i=0; i<1500; i++) this.stars.push({ x:Math.random()*4000-2000, y:Math.random()*4000-2000, z:Math.random()*4000, pz:0 });
-        this.animate();
-        window.onresize = () => this.resize();
-        this.canvas.onclick = (e) => this.handleInteraction(e);
-    },
+canvas.width = innerWidth
+canvas.height = innerHeight
 
-    resize() { this.w = this.canvas.width = window.innerWidth; this.h = this.canvas.height = window.innerHeight; },
+let currentPhase = "GATEWAY"
 
-    ignite() {
-        if(document.getElementById('pass').value !== "83") return alert("Sai mã!");
-        document.getElementById('gate-container').classList.add('hidden');
-        this.phase = 'WARP';
-        this.targetSpeed = 80;
-        setTimeout(() => {
-            this.targetSpeed = 0.5;
-            this.phase = 'EXPLORE';
-            this.buildConstellation();
-        }, 2500);
-    },
+let stars=[]
+let explorationStars=[]
+let particles=[]
 
-    buildConstellation() {
-        const cx = this.w/2, cy = this.h/2, u = Math.min(this.w, this.h)/10;
-        // Tọa độ 10A1 (giản lược để 30 điểm rải đều)
-        this.constellation = girlsData.map((g, i) => {
-            const angle = (i / 30) * Math.PI * 2;
-            return { ...g, x: cx + Math.cos(angle)*u*3, y: cy + Math.sin(angle)*u*3, op: 1, visible: true, size: 4 };
-        });
-    },
+let warpSpeed=0
+let warpTime=0
 
-    handleInteraction(e) {
-        if(this.phase !== 'EXPLORE') return;
-        this.constellation.forEach(s => {
-            if(s.visible && Math.hypot(e.clientX - s.x, e.clientY - s.y) < 20) {
-                this.showModal(s);
-            }
-        });
-    },
+let countdown=30
+let modalStar=null
 
-    showModal(s) {
-        document.getElementById('dispName').innerText = s.n;
-        document.getElementById('dispWish').innerText = s.w;
-        document.getElementById('wish-modal').classList.add('active');
-        this.currentStar = s;
-    },
+let bigBangTriggered=false
+let typeLock=false
 
-    closeModal() {
-        document.getElementById('wish-modal').classList.remove('active');
-        if(this.currentStar && !this.currentStar.clicked) {
-            this.currentStar.visible = false; // Ngôi sao mất đi
-            this.currentStar.clicked = true;
-            this.viewedCount++;
-            if(this.viewedCount >= 30) this.startCinematicEnding();
-        }
-    },
+/* STAR CLASS */
 
-    startCinematicEnding() {
-        this.phase = 'REBIRTH';
-        // 1. Xuất hiện lại 30 sao
-        this.constellation.forEach(s => { s.visible = true; s.op = 0; });
-        
-        // 2. Quay vòng và kết hợp
-        setTimeout(() => {
-            let angle = 0;
-            const spin = setInterval(() => {
-                angle += 0.2;
-                this.constellation.forEach((s, i) => {
-                    const r = (1 - angle/20) * 300; // Thu hẹp dần vào tâm
-                    s.x = this.w/2 + Math.cos(i + angle) * r;
-                    s.y = this.h/2 + Math.sin(i + angle) * r;
-                    if(r < 10) {
-                        clearInterval(spin);
-                        this.triggerBigBang();
-                    }
-                });
-            }, 30);
-        }, 1000);
-    },
+class Star{
+constructor(x,y){
+this.x=x
+this.y=y
+this.size=Math.random()*2
+this.vx=(Math.random()-0.5)*0.2
+this.vy=(Math.random()-0.5)*0.2
+}
+draw(){
+ctx.fillStyle="white"
+ctx.fillRect(this.x,this.y,this.size,this.size)
+}
+update(){
+this.x+=this.vx
+this.y+=this.vy
+}
+}
 
-   triggerBigBang() {
-    this.phase = 'BIGBANG';
-    // Tạo 500 hạt nổ ánh sáng từ tâm màn hình
-    this.bangParticles = Array.from({length: 500}, () => ({
-        x: this.w / 2,
-        y: this.h / 2,
-        vx: (Math.random() - 0.5) * 40, // Tốc độ bay ngang
-        vy: (Math.random() - 0.5) * 40, // Tốc độ bay dọc
-        c: `hsl(${Math.random() * 360}, 100%, 70%)`, // Màu sắc rực rỡ
-        size: Math.random() * 4 + 1
-    }));
+/* PARTICLE */
 
-    const overlay = document.getElementById('big-bang-overlay');
-    overlay.style.opacity = '1'; // Làm trắng màn hình tạm thời
+class Particle{
+constructor(x,y){
+this.x=x
+this.y=y
+this.vx=(Math.random()-0.5)*10
+this.vy=(Math.random()-0.5)*10
+this.life=1
+}
+update(){
+this.vx*=0.96
+this.vy*=0.96
+this.x+=this.vx
+this.y+=this.vy
+this.life-=0.01
+}
+draw(){
+ctx.globalAlpha=this.life
+ctx.fillStyle=`hsl(${Math.random()*360},100%,60%)`
+ctx.fillRect(this.x,this.y,2,2)
+ctx.globalAlpha=1
+}
+}
 
-    setTimeout(() => {
-        document.getElementById('teacher-part').classList.add('show');
-        overlay.style.opacity = '0';
-        
-        // Kích hoạt hiệu ứng chữ chạy cho Cô giáo (Đã hướng dẫn ở phần Typewriter)
-        this.typeWriter("typewriter-title", "GỬI CÔ CHỦ NHIỆM", 100);
-        setTimeout(() => {
-            this.typeWriter("typewriter-msg", "Người lái đò thầm lặng, bông hoa rực rỡ nhất trong dải ngân hà 10A1. Chúc Cô mãi hạnh phúc và rạng rỡ!", 40);
-        }, 1500);
+/* CREATE BACKGROUND STARS */
 
-        this.bangParticles = []; // Xóa hạt để giải phóng bộ nhớ
-    }, 1200);
-},
-   // --- ĐOẠN NÀY THAY THẾ TỪ HÀM ANIMATE ĐẾN HẾT SCRIPT ---
-    
-    // Hàm tạo chữ chạy (Hacker Typewriter)
-    typeWriter(elementId, text, speed = 50) {
-        let i = 0;
-        const el = document.getElementById(elementId);
-        if(!el) return;
-        el.innerHTML = ""; 
-        function type() {
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                setTimeout(type, speed);
-            }
-        }
-        type();
-    },
+for(let i=0;i<400;i++){
+stars.push(new Star(Math.random()*canvas.width,Math.random()*canvas.height))
+}
 
-    animate() {
-        this.speed += (this.targetSpeed - this.speed) * 0.05;
-        this.ctx.fillStyle = '#000';
-        this.ctx.fillRect(0,0,this.w,this.h);
+/* ENGAGE */
 
-        // 1. Vẽ sao nền (Starfield)
-        this.stars.forEach(s => {
-            s.pz = s.z; s.z -= this.speed;
-            if(s.z < 1) s.z = 4000;
-            let x = (s.x/s.z)*this.w + this.w/2, y = (s.y/s.z)*this.h + this.h/2;
-            this.ctx.fillStyle = `rgba(255,255,255,${1-s.z/4000})`;
-            this.ctx.fillRect(x, y, 2, 2);
-        });
+function engage(){
+let code=document.getElementById("code").value
+if(code==="83"){
+document.getElementById("gateway").style.display="none"
+currentPhase="SUCTION"
+}
+}
 
-        // 2. Vẽ 30 ngôi sao tương tác (Glow Effect nâng cấp)
-        if(this.phase === 'EXPLORE' || this.phase === 'REBIRTH') {
-            this.constellation.forEach(s => {
-                if(!s.visible) return;
+/* MODAL */
 
-                // Lớp 1: Hào quang (Glow)
-                let g = this.ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 8);
-                g.addColorStop(0, `rgba(0, 242, 255, ${s.op * 0.8})`);
-                g.addColorStop(0.5, `rgba(0, 242, 255, ${s.op * 0.2})`);
-                g.addColorStop(1, 'rgba(0, 242, 255, 0)');
-                this.ctx.fillStyle = g;
-                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size * 8, 0, Math.PI*2); this.ctx.fill();
+function openModal(star){
+modalStar=star
+document.getElementById("wish").innerText=
+"Chúc cô luôn mạnh khỏe, hạnh phúc và tiếp tục truyền cảm hứng cho chúng em."
+document.getElementById("modal").style.display="flex"
+}
 
-                // Lớp 2: Nhân sao trắng (Core)
-                this.ctx.fillStyle = `rgba(255, 255, 255, ${s.op})`;
-                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size/2, 0, Math.PI*2); this.ctx.fill();
-            });
-        }
+function closeModal(){
 
-        // 3. Vẽ vụ nổ Big Bang Particle
-        if(this.phase === 'BIGBANG' && this.bangParticles) {
-            this.bangParticles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                p.vx *= 0.96; p.vy *= 0.96; p.size *= 0.98;
-                this.ctx.fillStyle = p.c;
-                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, p.size, 0, 7); this.ctx.fill();
-            });
-            // Hiệu ứng rung màn hình khi nổ
-            this.ctx.translate((Math.random()-0.5)*5, (Math.random()-0.5)*5);
-        }
+document.getElementById("modal").style.display="none"
 
-        requestAnimationFrame(() => this.animate());
-    } // Đóng hàm animate
-}; // Đóng đối tượng Galaxy
+for(let i=0;i<20;i++){
+particles.push(new Particle(modalStar.x,modalStar.y))
+}
 
-Galaxy.init();
+explorationStars=explorationStars.filter(s=>s!==modalStar)
+
+countdown--
+
+if(countdown<=0){
+currentPhase="VORTEX"
+}
+
+}
+
+/* CREATE EXPLORATION STARS */
+
+function createExploration(){
+
+let cx=canvas.width/2
+let cy=canvas.height/2
+let r=250
+
+for(let i=0;i<30;i++){
+
+let angle=i*(Math.PI*2/30)
+
+explorationStars.push({
+x:cx+Math.cos(angle)*r,
+y:cy+Math.sin(angle)*r,
+size:6
+})
+
+}
+
+}
+
+/* TYPEWRITER */
+
+function typeWriter(text){
+
+if(typeLock) return
+typeLock=true
+
+let i=0
+let msg=document.getElementById("message")
+
+function type(){
+if(i<text.length){
+msg.innerHTML+=text[i]
+i++
+setTimeout(type,40)
+}
+}
+
+type()
+}
+
+/* CLICK DETECT */
+
+canvas.addEventListener("click",e=>{
+
+if(currentPhase!=="EXPLORATION") return
+
+let rect=canvas.getBoundingClientRect()
+let x=e.clientX-rect.left
+let y=e.clientY-rect.top
+
+explorationStars.forEach(star=>{
+let d=Math.hypot(x-star.x,y-star.y)
+if(d<10){
+openModal(star)
+}
+})
+
+})
+
+/* SCREEN SHAKE */
+
+function screenShake(){
+
+let shake=10
+canvas.style.transform=`translate(${(Math.random()-0.5)*shake}px,
+${(Math.random()-0.5)*shake}px)`
+
+setTimeout(()=>canvas.style.transform="translate(0,0)",100)
+
+}
+
+/* MAIN LOOP */
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+switch(currentPhase){
+
+case "GATEWAY":
+
+stars.forEach(s=>{
+s.update()
+s.draw()
+})
+
+ctx.beginPath()
+ctx.strokeStyle="cyan"
+ctx.arc(canvas.width/2,canvas.height/2,80,0,Math.PI*2)
+ctx.stroke()
+
+break
+
+
+case "SUCTION":
+
+stars.forEach(s=>{
+
+s.x+=(canvas.width/2-s.x)*0.02
+s.y+=(canvas.height/2-s.y)*0.02
+
+s.draw()
+
+})
+
+warpTime++
+
+if(warpTime>80){
+currentPhase="WARP"
+}
+
+break
+
+
+case "WARP":
+
+warpSpeed+=0.05
+
+stars.forEach(s=>{
+
+let dx=s.x-canvas.width/2
+let dy=s.y-canvas.height/2
+
+s.x+=dx*0.05*warpSpeed
+s.y+=dy*0.05*warpSpeed
+
+ctx.strokeStyle="white"
+ctx.beginPath()
+ctx.moveTo(s.x,s.y)
+ctx.lineTo(s.x-dx*0.02,s.y-dy*0.02)
+ctx.stroke()
+
+})
+
+warpTime++
+
+if(warpTime>200){
+
+createExploration()
+currentPhase="EXPLORATION"
+
+}
+
+break
+
+
+case "EXPLORATION":
+
+explorationStars.forEach(star=>{
+
+let g=ctx.createRadialGradient(
+star.x,star.y,0,
+star.x,star.y,20)
+
+g.addColorStop(0,"white")
+g.addColorStop(0.4,"cyan")
+g.addColorStop(1,"transparent")
+
+ctx.fillStyle=g
+ctx.beginPath()
+ctx.arc(star.x,star.y,20,0,Math.PI*2)
+ctx.fill()
+
+})
+
+particles.forEach(p=>{
+p.update()
+p.draw()
+})
+
+particles=particles.filter(p=>p.life>0)
+
+break
+
+
+case "VORTEX":
+
+let cx=canvas.width/2
+let cy=canvas.height/2
+
+explorationStars.forEach(star=>{
+
+star.x+=(cx-star.x)*0.05
+star.y+=(cy-star.y)*0.05
+
+ctx.fillStyle="white"
+ctx.beginPath()
+ctx.arc(star.x,star.y,3,0,Math.PI*2)
+ctx.fill()
+
+})
+
+if(Math.hypot(explorationStars[0].x-cx,explorationStars[0].y-cy)<5){
+
+currentPhase="BIGBANG"
+
+}
+
+break
+
+
+case "BIGBANG":
+
+if(!bigBangTriggered){
+
+for(let i=0;i<1000;i++){
+particles.push(new Particle(canvas.width/2,canvas.height/2))
+}
+
+screenShake()
+
+document.body.style.background=
+"linear-gradient(135deg,#ff6ec4,#7873f5)"
+
+typeWriter("Chúng em cảm ơn cô vì đã thắp sáng tri thức và truyền cảm hứng cho chúng em.")
+
+bigBangTriggered=true
+
+}
+
+particles.forEach(p=>{
+p.update()
+p.draw()
+})
+
+particles=particles.filter(p=>p.life>0)
+
+break
+
+}
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
 </script>
 </body>
 </html>
