@@ -76,9 +76,9 @@
 </div>
 
 <div id="teacher-part">
-    <h1 style="font-family:'Orbitron'; font-size:4rem; text-shadow:0 0 30px #f0f">GỬI CÔ CHỦ NHIỆM</h1>
-    <p style="font-size:1.5rem; color:#fff; max-width:600px">"Người lái đò thầm lặng, bông hoa rực rỡ nhất trong dải ngân hà 10A1. Chúc Cô mãi hạnh phúc và rạng rỡ!"</p>
-    <button onclick="location.reload()" style="background:#f0f; color:#fff; border:none; padding:15px 40px; cursor:pointer">QUAY LẠI VŨ TRỤ</button>
+    <h1 id="typewriter-title" style="font-family:'Orbitron'; font-size:4rem; text-shadow:0 0 30px #f0f"></h1>
+    <p id="typewriter-msg" style="font-size:1.5rem; color:#fff; max-width:600px; min-height: 100px; margin: 20px 0;"></p>
+    <button onclick="location.reload()" style="background:#f0f; color:#fff; border:none; padding:15px 40px; cursor:pointer; font-family:'Orbitron'; margin-top:30px">KHỞI TẠO LẠI VŨ TRỤ</button>
 </div>
 
 <script>
@@ -176,14 +176,50 @@ const Galaxy = {
         }, 1000);
     },
 
-    triggerBigBang() {
-        this.phase = 'BIGBANG';
-        const overlay = document.getElementById('big-bang-overlay');
-        overlay.style.opacity = '1'; // Vụ nổ trắng xóa
+   triggerBigBang() {
+    this.phase = 'BIGBANG';
+    // Tạo 500 hạt nổ ánh sáng từ tâm màn hình
+    this.bangParticles = Array.from({length: 500}, () => ({
+        x: this.w / 2,
+        y: this.h / 2,
+        vx: (Math.random() - 0.5) * 40, // Tốc độ bay ngang
+        vy: (Math.random() - 0.5) * 40, // Tốc độ bay dọc
+        c: `hsl(${Math.random() * 360}, 100%, 70%)`, // Màu sắc rực rỡ
+        size: Math.random() * 4 + 1
+    }));
+
+    const overlay = document.getElementById('big-bang-overlay');
+    overlay.style.opacity = '1'; // Làm trắng màn hình tạm thời
+
+    setTimeout(() => {
+        document.getElementById('teacher-part').classList.add('show');
+        overlay.style.opacity = '0';
+        
+        // Kích hoạt hiệu ứng chữ chạy cho Cô giáo (Đã hướng dẫn ở phần Typewriter)
+        this.typeWriter("typewriter-title", "GỬI CÔ CHỦ NHIỆM", 100);
         setTimeout(() => {
-            document.getElementById('teacher-part').classList.add('show');
-            overlay.style.opacity = '0';
-        }, 1000);
+            this.typeWriter("typewriter-msg", "Người lái đò thầm lặng, bông hoa rực rỡ nhất trong dải ngân hà 10A1. Chúc Cô mãi hạnh phúc và rạng rỡ!", 40);
+        }, 1500);
+
+        this.bangParticles = []; // Xóa hạt để giải phóng bộ nhớ
+    }, 1200);
+},
+   // --- ĐOẠN NÀY THAY THẾ TỪ HÀM ANIMATE ĐẾN HẾT SCRIPT ---
+    
+    // Hàm tạo chữ chạy (Hacker Typewriter)
+    typeWriter(elementId, text, speed = 50) {
+        let i = 0;
+        const el = document.getElementById(elementId);
+        if(!el) return;
+        el.innerHTML = ""; 
+        function type() {
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            }
+        }
+        type();
     },
 
     animate() {
@@ -191,7 +227,7 @@ const Galaxy = {
         this.ctx.fillStyle = '#000';
         this.ctx.fillRect(0,0,this.w,this.h);
 
-        // Render sao nền
+        // 1. Vẽ sao nền (Starfield)
         this.stars.forEach(s => {
             s.pz = s.z; s.z -= this.speed;
             if(s.z < 1) s.z = 4000;
@@ -200,18 +236,40 @@ const Galaxy = {
             this.ctx.fillRect(x, y, 2, 2);
         });
 
-        // Render chòm sao tương tác
+        // 2. Vẽ 30 ngôi sao tương tác (Glow Effect nâng cấp)
         if(this.phase === 'EXPLORE' || this.phase === 'REBIRTH') {
             this.constellation.forEach(s => {
                 if(!s.visible) return;
-                this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#00f2ff';
-                this.ctx.fillStyle = `rgba(0, 242, 255, ${s.op})`;
-                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size, 0, 7); this.ctx.fill();
+
+                // Lớp 1: Hào quang (Glow)
+                let g = this.ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 8);
+                g.addColorStop(0, `rgba(0, 242, 255, ${s.op * 0.8})`);
+                g.addColorStop(0.5, `rgba(0, 242, 255, ${s.op * 0.2})`);
+                g.addColorStop(1, 'rgba(0, 242, 255, 0)');
+                this.ctx.fillStyle = g;
+                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size * 8, 0, Math.PI*2); this.ctx.fill();
+
+                // Lớp 2: Nhân sao trắng (Core)
+                this.ctx.fillStyle = `rgba(255, 255, 255, ${s.op})`;
+                this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size/2, 0, Math.PI*2); this.ctx.fill();
             });
         }
+
+        // 3. Vẽ vụ nổ Big Bang Particle
+        if(this.phase === 'BIGBANG' && this.bangParticles) {
+            this.bangParticles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                p.vx *= 0.96; p.vy *= 0.96; p.size *= 0.98;
+                this.ctx.fillStyle = p.c;
+                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, p.size, 0, 7); this.ctx.fill();
+            });
+            // Hiệu ứng rung màn hình khi nổ
+            this.ctx.translate((Math.random()-0.5)*5, (Math.random()-0.5)*5);
+        }
+
         requestAnimationFrame(() => this.animate());
-    }
-};
+    } // Đóng hàm animate
+}; // Đóng đối tượng Galaxy
 
 Galaxy.init();
 </script>
