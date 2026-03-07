@@ -82,6 +82,239 @@
         <p id="typewriter-msg"></p>
         <button class="btn-launch" style="background:#f0f; box-shadow: 0 0 20px #f0f" onclick="location.reload()">KHỞI TẠO VŨ TRỤ</button>
     </div>
+<script>
+const Galaxy = {
+    canvas: document.getElementById('universe'),
+    ctx: null,
+    w: window.innerWidth,
+    h: window.innerHeight,
+    phase: 'GATE', // GATE -> WARP -> EXPLORE -> REBIRTH -> BIGBANG
+    stars: [],
+    constellation: [],
+    particles: [],
+    pass: '83',
+    currentStar: null,
+    isTyping: false,
 
+    init() {
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.width = this.w;
+        this.canvas.height = this.h;
+        this.createStarfield();
+        this.createConstellation();
+        this.animate();
+        window.addEventListener('resize', () => this.resize());
+    },
+
+    createStarfield() {
+        this.stars = Array.from({ length: 400 }, () => ({
+            x: Math.random() * this.w - this.w / 2,
+            y: Math.random() * this.h - this.h / 2,
+            z: Math.random() * this.w,
+            pz: 0
+        }));
+    },
+
+    // --- LOGIC XẾP CHỮ 10A1 ---
+    createConstellation() {
+        const points = [];
+        const scale = 120; // Độ lớn của chữ
+        const cx = this.w / 2, cy = this.h / 2;
+
+        // Tọa độ thô để tạo hình 10A1 (30 điểm tương ứng 30 bạn nữ)
+        const rawPoints = [
+            // Số 1
+            {x: -1.5, y: -1}, {x: -1.5, y: 0}, {x: -1.5, y: 1}, 
+            // Số 0
+            {x: -0.5, y: -1}, {x: 0, y: -1}, {x: 0.5, y: -1},
+            {x: -0.5, y: 1}, {x: 0, y: 1}, {x: 0.5, y: 1},
+            {x: -0.5, y: 0}, {x: 0.5, y: 0},
+            // Chữ A
+            {x: 1.2, y: 1}, {x: 1.4, y: 0}, {x: 1.6, y: -1}, {x: 1.8, y: 0}, {x: 2, y: 1}, {x: 1.4, y: 0.3}, {x: 1.8, y: 0.3},
+            // Số 1 (cuối)
+            {x: 2.8, y: -1}, {x: 2.8, y: 0}, {x: 2.8, y: 1},
+            // Bổ sung thêm các điểm để đủ 30 bạn
+            {x: -0.5, y: -0.5}, {x: 0.5, y: -0.5}, {x: -0.5, y: 0.5}, {x: 0.5, y: 0.5},
+            {x: 1.6, y: -0.4}, {x: 1.3, y: 0.5}, {x: 1.9, y: 0.5}, {x: 2.8, y: -0.5}, {x: 2.8, y: 0.5}
+        ];
+
+        this.constellation = rawPoints.map((p, i) => ({
+            baseX: cx + p.x * scale,
+            baseY: cy + p.y * scale,
+            x: cx + p.x * scale,
+            y: cy + p.y * scale,
+            size: 4 + Math.random() * 3,
+            op: 1,
+            visible: true,
+            clicked: false,
+            name: `Bạn Nữ ${i + 1}`,
+            wish: `Chúc bạn ngày 8/3 rạng rỡ như ngôi sao thứ ${i + 1} trong chòm sao 10A1!`,
+            angle: Math.random() * Math.PI * 2 // Dùng để tạo hiệu ứng phập phồng nương theo nét chữ
+        }));
+    },
+
+    ignite() {
+        const input = document.getElementById('pass').value;
+        if (input === this.pass) {
+            document.getElementById('gate-container').classList.add('hidden');
+            this.phase = 'WARP';
+            setTimeout(() => { this.phase = 'EXPLORE'; }, 3000); // 3s bay tốc độ ánh sáng
+        } else {
+            alert("Mật mã 8/3 là ngày nào nhỉ? Gợi ý: 83");
+        }
+    },
+
+    openModal(star) {
+        if (this.phase !== 'EXPLORE' || star.clicked) return;
+        this.currentStar = star;
+        document.getElementById('dispName').innerText = star.name;
+        document.getElementById('dispWish').innerText = star.wish;
+        document.getElementById('wish-modal').classList.add('active');
+    },
+
+    closeModal() {
+        if (this.currentStar) {
+            this.currentStar.clicked = true;
+            this.currentStar.visible = false;
+        }
+        document.getElementById('wish-modal').classList.remove('active');
+        
+        // Kiểm tra logic: Nếu hết 30 sao thì kích hoạt REBIRTH -> BIGBANG
+        const remaining = this.constellation.filter(s => !s.clicked).length;
+        if (remaining === 0) {
+            setTimeout(() => { this.phase = 'REBIRTH'; }, 500);
+        }
+    },
+
+    // --- HÀM CHỮ CHẠY AN TOÀN ---
+    typeWriter(id, text, speed, callback) {
+        let i = 0;
+        const el = document.getElementById(id);
+        el.innerHTML = "";
+        const timer = setInterval(() => {
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(timer);
+                if (callback) callback();
+            }
+        }, speed);
+    },
+
+    triggerBigBang() {
+        this.phase = 'BIGBANG';
+        // Hiệu ứng rung màn hình mạnh
+        let shake = 20;
+        const shakeInterval = setInterval(() => {
+            this.canvas.style.transform = `translate(${(Math.random()-0.5)*shake}px, ${(Math.random()-0.5)*shake}px)`;
+            shake *= 0.9;
+            if(shake < 1) {
+                clearInterval(shakeInterval);
+                this.canvas.style.transform = 'translate(0,0)';
+            }
+        }, 30);
+
+        // Hiện trang của Cô giáo sau cú nổ
+        setTimeout(() => {
+            document.getElementById('teacher-part').classList.add('show');
+            if (!this.isTyping) {
+                this.isTyping = true;
+                this.typeWriter("typewriter-title", "GỬI CÔ CHỦ NHIỆM 10A1", 80, () => {
+                    this.typeWriter("typewriter-msg", "Người lái đò thầm lặng, bông hoa rạng rỡ nhất của dải ngân hà này. Tập thể lớp chúc Cô luôn hạnh phúc, xinh đẹp và mãi là nguồn cảm hứng cho chúng em! Chúc mừng ngày 8/3.", 40);
+                });
+            }
+        }, 1500);
+    },
+
+    drawStar(s) {
+        // Vẽ hào quang (Glow)
+        let g = this.ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 6);
+        g.addColorStop(0, `rgba(0, 242, 255, ${s.op * 0.6})`);
+        g.addColorStop(1, 'rgba(0, 242, 255, 0)');
+        this.ctx.fillStyle = g;
+        this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size * 6, 0, Math.PI*2); this.ctx.fill();
+
+        // Nhân trắng sắc nét
+        this.ctx.fillStyle = `rgba(255, 255, 255, ${s.op})`;
+        this.ctx.beginPath(); this.ctx.arc(s.x, s.y, s.size/2, 0, Math.PI*2); this.ctx.fill();
+    },
+
+    animate() {
+        this.ctx.fillStyle = 'black';
+        this.ctx.fillRect(0, 0, this.w, this.h);
+
+        // 1. Vẽ nền sao (Starfield)
+        this.stars.forEach(s => {
+            let speed = (this.phase === 'WARP') ? 40 : 1;
+            s.z -= speed;
+            if (s.z <= 0) s.z = this.w;
+            let x = (s.x / s.z) * this.w + this.w / 2;
+            let y = (s.y / s.z) * this.h + this.h / 2;
+            this.ctx.fillStyle = "white";
+            // Hiệu ứng kéo dài khi bay (Warp)
+            let size = (this.phase === 'WARP') ? 15 : 2;
+            this.ctx.fillRect(x, y, size, 2);
+        });
+
+        // 2. Vẽ 30 ngôi sao chữ 10A1
+        if (this.phase === 'EXPLORE' || this.phase === 'REBIRTH') {
+            this.constellation.forEach(s => {
+                if (!s.visible && this.phase === 'EXPLORE') return;
+                
+                if (this.phase === 'EXPLORE') {
+                    // Phập phồng nhẹ nương theo nét chữ
+                    s.angle += 0.05;
+                    s.x = s.baseX + Math.sin(s.angle) * 3;
+                    s.y = s.baseY + Math.cos(s.angle) * 3;
+                } else if (this.phase === 'REBIRTH') {
+                    // Tụ họp về tâm với tốc độ tăng dần
+                    s.visible = true;
+                    let dx = this.w/2 - s.x, dy = this.h/2 - s.y;
+                    s.x += dx * 0.05; s.y += dy * 0.05;
+                    if(Math.abs(dx) < 5) this.triggerBigBang();
+                }
+                this.drawStar(s);
+            });
+        }
+
+        // 3. Vụ nổ Big Bang
+        if (this.phase === 'BIGBANG') {
+            if (this.particles.length === 0) {
+                for(let i=0; i<300; i++) {
+                    this.particles.push({
+                        x: this.w/2, y: this.h/2,
+                        vx: (Math.random()-0.5)*25, vy: (Math.random()-0.5)*25,
+                        c: `hsl(${Math.random()*360}, 100%, 70%)`, size: Math.random()*5
+                    });
+                }
+            }
+            this.particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                p.vx *= 0.96; p.vy *= 0.96;
+                this.ctx.fillStyle = p.c;
+                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, p.size, 0, 7); this.ctx.fill();
+            });
+        }
+
+        requestAnimationFrame(() => this.animate());
+    },
+
+    resize() {
+        this.w = window.innerWidth; this.h = window.innerHeight;
+        this.canvas.width = this.w; this.canvas.height = this.h;
+    }
+};
+
+// Lắng nghe sự kiện click vào sao
+window.addEventListener('mousedown', (e) => {
+    Galaxy.constellation.forEach(s => {
+        let d = Math.hypot(e.clientX - s.x, e.clientY - s.y);
+        if (d < 20) Galaxy.openModal(s);
+    });
+});
+
+Galaxy.init();
+</script>
     </body>
 </html>
