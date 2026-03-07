@@ -101,14 +101,20 @@ function draw() {
 
         if((currentScene === 'CONSTELLATION' || currentScene === 'VORTEX') && i < 30) {
             let girl = girls[i];
-            if(currentScene === 'VORTEX') {
-                let angle = 0.15;
-                let oldX = girl.x;
-                girl.x = (girl.x * Math.cos(angle) - girl.y * Math.sin(angle)) * 0.92;
-                girl.y = (oldX * Math.sin(angle) + girl.y * Math.cos(angle)) * 0.92;
-                shake = 30;
-                if(Math.abs(girl.x) < 1) currentScene = 'SUPERNOVA';
-            }
+          if(currentScene === 'VORTEX') {
+    let angle = 0.15;
+    let oldX = girl.x;
+    // Hút vào tâm với tốc độ nhanh dần
+    girl.x = (girl.x * Math.cos(angle) - girl.y * Math.sin(angle)) * 0.92;
+    girl.y = (oldX * Math.sin(angle) + girl.y * Math.cos(angle)) * 0.92;
+    
+    shake = 30;
+
+    // Chỉ cần các sao vào gần tâm (dưới 2px) là kích nổ luôn
+    if(Math.abs(girl.x) < 2 && Math.abs(girl.y) < 2) {
+        currentScene = 'SUPERNOVA';
+    }
+}
             s.x += (girl.x - s.x) * 0.08; 
             s.y += (girl.y - s.y) * 0.08; 
             s.z = 1000;
@@ -202,8 +208,16 @@ function unlockGirl() {
 
 function closePortal() {
     document.getElementById('scene-unlock').classList.add('hidden');
-    if(girls.every(g => g.unlocked)) {
-        setTimeout(() => { currentScene = 'VORTEX'; }, 1000);
+    
+    // Kiểm tra xem đã mở khóa đủ 30 bạn chưa
+    const allUnlocked = girls.every(g => g.unlocked === true);
+    
+    if(allUnlocked) {
+        // Chờ 1 giây cho popup đóng hẳn rồi bắt đầu xoáy
+        setTimeout(() => { 
+            currentScene = 'VORTEX'; 
+            shake = 30; // Thêm độ rung cho kịch tính
+        }, 1000);
     }
 }
 
