@@ -106,7 +106,14 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
             <button class="launch-btn" onclick="CosmicEngine.warpDrive()">KHỞI ĐỘNG</button>
         </div>
     </div>
-
+<div class="info-overlay" id="detail-overlay" onclick="CosmicEngine.closeDetail()">
+        <div class="galaxy-card" id="detail-card">
+            <div class="girl-avatar" id="girl-img"></div>
+            <h2 id="girl-name" style="color: var(--cyan-glow); letter-spacing: 5px;">TÊN BẠN NỮ</h2>
+            <p id="girl-wish" style="font-style: italic; line-height: 1.6;">Lời chúc sẽ hiện ở đây...</p>
+            <button class="launch-btn" style="padding: 10px 30px;">ĐÓNG</button>
+        </div>
+    </div>
   <script>
     const CosmicConfig = {
         starCount: 1500,
@@ -217,50 +224,68 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
             ctx.restore();
         }
     }
-
+class GirlStar {
+        constructor(id, canvas) {
+            this.canvas = canvas;
+            this.id = id;
+            this.init();
+        }
+        init() {
+            this.x = (Math.random() - 0.5) * this.canvas.width * 2.5;
+            this.y = (Math.random() - 0.5) * this.canvas.height * 2.5;
+            this.z = Math.random() * this.canvas.width;
+            this.color = Math.random() > 0.5 ? "#ff75c3" : "#00ffff";
+            this.angle = Math.random() * Math.PI * 2;
+            this.name = "Bạn Nữ " + (this.id + 1);
+            this.wish = "Chúc bạn một ngày 8/3 thật xinh đẹp và hạnh phúc!";
+            this.screenX = 0; this.screenY = 0; this.finalR = 0;
+        }
+        update() { this.angle += 0.01; this.y += Math.sin(this.angle) * 0.2; }
+        draw(ctx) {
+            let w = this.canvas.width, h = this.canvas.height;
+            let scale = w / (w + this.z);
+            let x2d = this.x * scale + w / 2, y2d = this.y * scale + h / 2;
+            let r = 25 * scale;
+            let g = ctx.createRadialGradient(x2d, y2d, 0, x2d, y2d, r * 4);
+            g.addColorStop(0, this.color); g.addColorStop(1, "transparent");
+            ctx.fillStyle = g; ctx.globalAlpha = 0.5;
+            ctx.beginPath(); ctx.arc(x2d, y2d, r * 4, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 1; ctx.fillStyle = "#fff";
+            ctx.beginPath(); ctx.arc(x2d, y2d, r, 0, Math.PI * 2); ctx.fill();
+            this.screenX = x2d; this.screenY = y2d; this.finalR = r * 4;
+        }
+    }
     // --- ENGINE ĐIỀU KHIỂN CHÍNH ---
 
-    const CosmicEngine = {
+   const CosmicEngine = {
         canvas: null, ctx: null,
-        stars: [], meteors: [], nebula: null,
+        stars: [], meteors: [], femaleStars: [], nebula: null,
         speed: CosmicConfig.baseSpeed,
-        isWarping: false,
 
         init() {
             this.canvas = document.getElementById('universe');
             this.ctx = this.canvas.getContext('2d');
             this.resize();
             window.addEventListener('resize', () => this.resize());
-
-            // 1. Khởi tạo Nebula
             this.nebula = new Nebula(this.canvas);
-
-            // 2. Khởi tạo Meteor
             for(let i=0; i<3; i++) this.meteors.push(new Meteor(this.canvas));
-
-            // 3. Khởi tạo Stars
             for(let i=0; i < CosmicConfig.starCount; i++) {
                 this.stars.push(new Particle(this.canvas.width, this.canvas.height));
             }
-            
             this.render();
         },
 
-        resize() {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-        },
+        resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
 
         warpDrive() {
             const p = document.getElementById('gate-pass').value;
             if(p === CosmicConfig.gatePassword) {
-                this.isWarping = true;
                 document.getElementById('gate-ui').classList.add('hidden');
                 let warpInterval = setInterval(() => {
-                    this.speed += 1;
+                    this.speed += 1.5;
                     if(this.speed >= CosmicConfig.warpSpeed) {
                         clearInterval(warpInterval);
-                        setTimeout(() => this.enterUniverse(), 1500);
+                        setTimeout(() => this.enterUniverse(), 1200);
                     }
                 }, 50);
             } else { alert("Sai mật mã!"); }
@@ -269,34 +294,37 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
         enterUniverse() {
             let slowDown = setInterval(() => {
                 this.speed -= 1;
-                if(this.speed <= 2) {
+                if(this.speed <= 1.5) {
                     clearInterval(slowDown);
-                    this.speed = 2;
-                    // Kích hoạt Module 30 bạn nữ tại đây
-                    alert("Chào mừng đến với Galaxy 8-3 siêu thực!");
+                    this.speed = 1.5;
+                    // Tạo 30 thực thể bạn nữ
+                    for(let i=0; i<30; i++) this.femaleStars.push(new GirlStar(i, this.canvas));
+                    this.canvas.addEventListener('click', (e) => this.checkClick(e));
                 }
             }, 100);
         },
 
+        checkClick(e) {
+            this.femaleStars.forEach(s => {
+                let dist = Math.hypot(e.clientX - s.screenX, e.clientY - s.screenY);
+                if(dist < s.finalR) {
+                    document.getElementById('girl-name').innerText = s.name;
+                    document.getElementById('girl-wish').innerText = s.wish;
+                    document.getElementById('girl-img').style.backgroundImage = `url('img/image_${s.id % 3}.png')`; // Tự lặp lại 3 ảnh bạn có
+                    document.getElementById('detail-overlay').style.display = 'flex';
+                }
+            });
+        },
+
+        closeDetail() { document.getElementById('detail-overlay').style.display = 'none'; },
+
         render() {
-            // Hiệu ứng Motion Blur
             this.ctx.fillStyle = "rgba(0, 2, 5, 0.2)";
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-            // Vẽ theo thứ tự lớp (Layering)
-            this.nebula.update();
-            this.nebula.draw(this.ctx);
-
-            this.stars.forEach(s => {
-                s.update(this.speed);
-                s.draw(this.ctx, this.canvas.width, this.canvas.height);
-            });
-
-            this.meteors.forEach(m => {
-                m.update();
-                m.draw(this.ctx);
-            });
-
+            this.nebula.update(); this.nebula.draw(this.ctx);
+            this.stars.forEach(s => { s.update(this.speed); s.draw(this.ctx, this.canvas.width, this.canvas.height); });
+            this.meteors.forEach(m => { m.update(); m.draw(this.ctx); });
+            this.femaleStars.forEach(fs => { fs.update(); fs.draw(this.ctx); });
             requestAnimationFrame(() => this.render());
         }
     };
