@@ -10,11 +10,11 @@ body{
 margin:0;
 overflow:hidden;
 background:black;
-font-family:Arial;
+font-family:Segoe UI;
 color:white;
 }
 
-/* GATEWAY */
+/* GATEWAY UI */
 
 #gateway{
 position:absolute;
@@ -22,23 +22,23 @@ top:50%;
 left:50%;
 transform:translate(-50%,-50%);
 text-align:center;
-z-index:5;
+z-index:10;
 }
 
 input{
 padding:10px;
 font-size:18px;
-border:none;
 border-radius:6px;
+border:none;
 }
 
 button{
-padding:10px 18px;
+padding:10px 20px;
 font-size:18px;
-cursor:pointer;
 border:none;
 border-radius:6px;
 background:cyan;
+cursor:pointer;
 margin-left:10px;
 }
 
@@ -54,29 +54,35 @@ display:none;
 justify-content:center;
 align-items:center;
 background:rgba(0,0,0,0.4);
-backdrop-filter:blur(10px);
-z-index:10;
+backdrop-filter:blur(12px);
+z-index:20;
 }
 
-#modalContent{
+#modalBox{
 background:rgba(255,255,255,0.1);
-border:1px solid rgba(255,255,255,0.3);
+border:1px solid rgba(255,255,255,0.25);
 padding:40px;
 border-radius:20px;
 max-width:420px;
 text-align:center;
 }
 
-/* MESSAGE */
+#modalName{
+font-size:24px;
+color:cyan;
+margin-bottom:10px;
+}
 
-#message{
+/* FINAL PAGE */
+
+#teacherPage{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-font-size:32px;
 text-align:center;
 width:70%;
+font-size:28px;
 }
 
 </style>
@@ -85,19 +91,21 @@ width:70%;
 <body>
 
 <div id="gateway">
-<h2>GALAXY 10A1</h2>
+<h2>CONSTELLATION 10A1</h2>
 <input id="code" placeholder="Enter Code">
 <button onclick="engage()">ENGAGE</button>
 </div>
 
 <div id="modal">
-<div id="modalContent">
-<p id="wish"></p>
-<button onclick="closeModal()">Close</button>
+<div id="modalBox">
+<div id="modalName"></div>
+<div id="modalText"></div>
+<br>
+<button onclick="closeModal()">TIẾP TỤC KHÁM PHÁ</button>
 </div>
 </div>
 
-<div id="message"></div>
+<div id="teacherPage"></div>
 
 <canvas id="c"></canvas>
 
@@ -109,128 +117,121 @@ const ctx=canvas.getContext("2d")
 canvas.width=innerWidth
 canvas.height=innerHeight
 
-let currentPhase="GATEWAY"
+/* PHASE */
+
+let phase="GATEWAY"
+
+/* DATA */
+
+const girlsData=[
+{name:"Bạn 1",msg:"Chúc bạn luôn tỏa sáng như ngôi sao."},
+{name:"Bạn 2",msg:"Chúc bạn luôn vui vẻ và hạnh phúc."},
+{name:"Bạn 3",msg:"Chúc bạn thành công trên mọi hành trình."},
+{name:"Bạn 4",msg:"Luôn mạnh mẽ và tự tin nhé."},
+{name:"Bạn 5",msg:"Bạn là ánh sao rực rỡ của 10A1."},
+{name:"Bạn 6",msg:"Chúc bạn luôn đạt được ước mơ."},
+{name:"Bạn 7",msg:"Chúc bạn thật nhiều niềm vui."},
+{name:"Bạn 8",msg:"Luôn xinh đẹp và tỏa sáng."},
+{name:"Bạn 9",msg:"Bạn là một phần tuyệt vời của lớp."},
+{name:"Bạn 10",msg:"Chúc bạn thành công."},
+{name:"Bạn 11",msg:"Chúc bạn thật nhiều năng lượng."},
+{name:"Bạn 12",msg:"Chúc bạn luôn vui."},
+{name:"Bạn 13",msg:"Bạn là ngôi sao của lớp."},
+{name:"Bạn 14",msg:"Chúc bạn luôn mạnh mẽ."},
+{name:"Bạn 15",msg:"Chúc bạn thật nhiều may mắn."},
+{name:"Bạn 16",msg:"Bạn luôn tuyệt vời."},
+{name:"Bạn 17",msg:"Chúc bạn thành công."},
+{name:"Bạn 18",msg:"Chúc bạn nhiều niềm vui."},
+{name:"Bạn 19",msg:"Bạn luôn tỏa sáng."},
+{name:"Bạn 20",msg:"Chúc bạn đạt mọi ước mơ."},
+{name:"Bạn 21",msg:"Chúc bạn hạnh phúc."},
+{name:"Bạn 22",msg:"Chúc bạn rực rỡ."},
+{name:"Bạn 23",msg:"Chúc bạn vui vẻ."},
+{name:"Bạn 24",msg:"Chúc bạn bình an."},
+{name:"Bạn 25",msg:"Chúc bạn hạnh phúc."},
+{name:"Bạn 26",msg:"Chúc bạn thật nhiều năng lượng."},
+{name:"Bạn 27",msg:"Chúc bạn luôn tỏa sáng."},
+{name:"Bạn 28",msg:"Chúc bạn thật tuyệt vời."},
+{name:"Bạn 29",msg:"Chúc bạn thành công."},
+{name:"Bạn 30",msg:"Chúc bạn luôn vui vẻ."}
+]
+
+const teacherData={
+title:"GỬI CÔ CHỦ NHIỆM TÂM HUYẾT",
+msg:"Cô không chỉ dạy chúng em kiến thức, mà còn dạy chúng em cách trưởng thành. Tập thể 10A1 xin cảm ơn cô vì sự tận tâm, kiên nhẫn và tình yêu thương mà cô dành cho chúng em."
+}
+
+/* STARS */
+
+let bgStars=[]
+for(let i=0;i<500;i++){
+bgStars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height
+})
+}
+
+/* CONSTELLATION */
 
 let stars=[]
-let explorationStars=[]
+let removed=0
+
+function createConstellation(){
+
+let startX=canvas.width/2-250
+let startY=canvas.height/2-80
+
+let coords=[]
+
+/* 10A1 pattern */
+
+for(let i=0;i<10;i++) coords.push({x:startX+i*50,y:startY})
+for(let i=0;i<10;i++) coords.push({x:startX+i*50,y:startY+80})
+for(let i=0;i<10;i++) coords.push({x:startX+i*50,y:startY+160})
+
+coords.forEach((p,i)=>{
+
+stars.push({
+x:p.x,
+y:p.y,
+baseX:p.x,
+baseY:p.y,
+data:girlsData[i],
+alive:true,
+pulse:Math.random()*10
+})
+
+})
+
+}
+
+/* PARTICLES */
+
 let particles=[]
 
-let warpSpeed=0
-let warpTimer=0
-let vortexAngle=0
+function createExplosion(x,y,count){
 
-let modalStar=null
-let countdown=30
+for(let i=0;i<count;i++){
 
-let bigBangTriggered=false
-let typeLock=false
-
-/* STARFIELD */
-
-class Star{
-
-constructor(){
-this.reset()
-}
-
-reset(){
-this.x=Math.random()*canvas.width
-this.y=Math.random()*canvas.height
-this.z=Math.random()*2
-this.size=this.z*1.5
-this.twinkle=Math.random()*0.5
-}
-
-update(){
-this.twinkle+=0.05
-}
-
-draw(){
-
-ctx.globalAlpha=0.5+Math.sin(this.twinkle)*0.5
-ctx.fillStyle="white"
-ctx.fillRect(this.x,this.y,this.size,this.size)
-ctx.globalAlpha=1
+particles.push({
+x,y,
+vx:(Math.random()-0.5)*10,
+vy:(Math.random()-0.5)*10,
+life:1
+})
 
 }
 
 }
 
-/* PARTICLE */
-
-class Particle{
-
-constructor(x,y){
-
-this.x=x
-this.y=y
-
-this.vx=(Math.random()-0.5)*12
-this.vy=(Math.random()-0.5)*12
-
-this.life=1
-this.size=2+Math.random()*2
-
-}
-
-update(){
-
-this.vx*=0.96
-this.vy*=0.96
-
-this.x+=this.vx
-this.y+=this.vy
-
-this.life-=0.01
-
-}
-
-draw(){
-
-ctx.globalAlpha=this.life
-ctx.fillStyle=`hsl(${Math.random()*360},100%,60%)`
-ctx.fillRect(this.x,this.y,this.size,this.size)
-ctx.globalAlpha=1
-
-}
-
-}
-
-/* CREATE STARS */
-
-for(let i=0;i<600;i++) stars.push(new Star())
-
-/* ENGAGE */
+/* GATEWAY */
 
 function engage(){
 
 if(document.getElementById("code").value==="83"){
 
 document.getElementById("gateway").style.display="none"
-currentPhase="SUCTION"
-
-}
-
-}
-
-/* EXPLORATION STARS */
-
-function createExploration(){
-
-let cx=canvas.width/2
-let cy=canvas.height/2
-let radius=260
-
-for(let i=0;i<30;i++){
-
-let angle=i*(Math.PI*2/30)
-
-explorationStars.push({
-angle:angle,
-radius:radius,
-x:cx+Math.cos(angle)*radius,
-y:cy+Math.sin(angle)*radius
-})
+phase="SUCTION"
 
 }
 
@@ -238,12 +239,14 @@ y:cy+Math.sin(angle)*radius
 
 /* MODAL */
 
+let currentStar=null
+
 function openModal(star){
 
-modalStar=star
+currentStar=star
 
-document.getElementById("wish").innerText=
-"Cảm ơn cô vì đã luôn kiên nhẫn, tận tâm và truyền cảm hứng cho chúng em trên hành trình tri thức."
+document.getElementById("modalName").innerText=star.data.name
+document.getElementById("modalText").innerText=star.data.msg
 
 document.getElementById("modal").style.display="flex"
 
@@ -253,59 +256,66 @@ function closeModal(){
 
 document.getElementById("modal").style.display="none"
 
-/* MINI BURST */
+currentStar.alive=false
 
-for(let i=0;i<40;i++){
+createExplosion(currentStar.x,currentStar.y,30)
 
-particles.push(new Particle(modalStar.x,modalStar.y))
+removed++
+
+if(removed===30){
+
+setTimeout(()=>{
+stars=[]
+createConstellation()
+phase="VORTEX"
+},800)
 
 }
-
-explorationStars=explorationStars.filter(s=>s!==modalStar)
-
-countdown--
-
-if(countdown<=0) currentPhase="VORTEX"
 
 }
 
 /* CLICK */
 
-canvas.addEventListener("click",e=>{
+canvas.onclick=e=>{
 
-if(currentPhase!=="EXPLORATION") return
+if(phase!=="EXPLORE") return
 
 let rect=canvas.getBoundingClientRect()
 let x=e.clientX-rect.left
 let y=e.clientY-rect.top
 
-explorationStars.forEach(star=>{
+stars.forEach(s=>{
 
-let d=Math.hypot(x-star.x,y-star.y)
+if(!s.alive) return
 
-if(d<15) openModal(star)
+if(Math.hypot(x-s.x,y-s.y)<20){
+openModal(s)
+}
 
 })
 
-})
+}
 
 /* TYPEWRITER */
 
+let isTyping=false
+
 function typeWriter(text){
 
-if(typeLock) return
-typeLock=true
+if(isTyping) return
+isTyping=true
 
 let i=0
-let msg=document.getElementById("message")
+let el=document.getElementById("teacherPage")
 
 function type(){
 
 if(i<text.length){
 
-msg.innerHTML+=text[i]
+el.innerHTML+=text[i]
 i++
-setTimeout(type,45)
+
+setTimeout(type,40)
 
 }
 
@@ -315,141 +325,92 @@ type()
 
 }
 
-/* SCREEN SHAKE */
+/* LOOP */
 
-function screenShake(){
-
-let intensity=12
-
-let shake=setInterval(()=>{
-
-canvas.style.transform=
-`translate(${(Math.random()-0.5)*intensity}px,
-${(Math.random()-0.5)*intensity}px)`
-
-},30)
-
-setTimeout(()=>{
-
-clearInterval(shake)
-canvas.style.transform="translate(0,0)"
-
-},500)
-
-}
-
-/* MAIN LOOP */
+let vortexAngle=0
 
 function animate(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
-switch(currentPhase){
-
-/* GATEWAY */
+switch(phase){
 
 case "GATEWAY":
 
-stars.forEach(s=>{
-s.update()
-s.draw()
+bgStars.forEach(s=>{
+ctx.fillStyle="white"
+ctx.fillRect(s.x,s.y,1,1)
 })
 
 ctx.strokeStyle="cyan"
-ctx.lineWidth=3
 ctx.beginPath()
-ctx.arc(canvas.width/2,canvas.height/2,80,0,Math.PI*2)
+ctx.arc(canvas.width/2,canvas.height/2,70,0,Math.PI*2)
 ctx.stroke()
 
 break
 
-/* SUCTION */
-
 case "SUCTION":
 
-stars.forEach(s=>{
-
-s.x+=(canvas.width/2-s.x)*0.02
-s.y+=(canvas.height/2-s.y)*0.02
-
-s.draw()
-
+bgStars.forEach(s=>{
+s.x+=(canvas.width/2-s.x)*0.1
+s.y+=(canvas.height/2-s.y)*0.1
+ctx.fillRect(s.x,s.y,1,1)
 })
 
-warpTimer++
-
-if(warpTimer>90){
-currentPhase="WARP"
-}
+setTimeout(()=>phase="WARP",1000)
 
 break
 
-/* WARP DRIVE */
-
 case "WARP":
 
-warpSpeed+=0.05
-
-stars.forEach(s=>{
+bgStars.forEach(s=>{
 
 let dx=s.x-canvas.width/2
 let dy=s.y-canvas.height/2
 
-s.x+=dx*0.06*warpSpeed
-s.y+=dy*0.06*warpSpeed
+s.x+=dx*0.1
+s.y+=dy*0.1
 
-ctx.strokeStyle="white"
 ctx.beginPath()
 ctx.moveTo(s.x,s.y)
-ctx.lineTo(s.x-dx*0.03,s.y-dy*0.03)
+ctx.lineTo(s.x-dx*0.1,s.y-dy*0.1)
+ctx.strokeStyle="white"
 ctx.stroke()
 
 })
 
-warpTimer++
-
-if(warpTimer>220){
-
-createExploration()
-currentPhase="EXPLORATION"
-
-}
+setTimeout(()=>{
+createConstellation()
+phase="EXPLORE"
+},2500)
 
 break
 
-/* EXPLORATION */
+case "EXPLORE":
 
-case "EXPLORATION":
+stars.forEach(s=>{
 
-explorationStars.forEach(star=>{
+if(!s.alive) return
 
-let g=ctx.createRadialGradient(
-star.x,star.y,0,
-star.x,star.y,30)
+s.pulse+=0.05
+
+s.x=s.baseX+Math.sin(s.pulse)*4
+s.y=s.baseY+Math.cos(s.pulse)*4
+
+let g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,20)
 
 g.addColorStop(0,"white")
 g.addColorStop(0.3,"cyan")
-g.addColorStop(0.6,"rgba(150,150,255,0.4)")
 g.addColorStop(1,"transparent")
 
 ctx.fillStyle=g
-
 ctx.beginPath()
-ctx.arc(star.x,star.y,30,0,Math.PI*2)
+ctx.arc(s.x,s.y,20,0,Math.PI*2)
 ctx.fill()
 
 })
 
-particles.forEach(p=>{
-p.update()
-p.draw()
-})
-
-particles=particles.filter(p=>p.life>0)
-
 break
-
-/* VORTEX */
 
 case "VORTEX":
 
@@ -458,59 +419,66 @@ let cy=canvas.height/2
 
 vortexAngle+=0.05
 
-explorationStars.forEach(star=>{
+stars.forEach((s,i)=>{
 
-star.radius*=0.97
-star.angle+=0.1
+s.baseX=cx+Math.cos(vortexAngle+i)*200
+s.baseY=cy+Math.sin(vortexAngle+i)*200
 
-star.x=cx+Math.cos(star.angle)*star.radius
-star.y=cy+Math.sin(star.angle)*star.radius
+s.baseX+=(cx-s.baseX)*0.05
+s.baseY+=(cy-s.baseY)*0.05
 
 ctx.fillStyle="white"
-
 ctx.beginPath()
-ctx.arc(star.x,star.y,3,0,Math.PI*2)
+ctx.arc(s.baseX,s.baseY,3,0,Math.PI*2)
 ctx.fill()
 
 })
 
-if(explorationStars[0].radius<5){
-currentPhase="BIGBANG"
+if(Math.abs(stars[0].baseX-cx)<5){
+
+phase="BIGBANG"
+
+createExplosion(cx,cy,1000)
+
 }
 
 break
 
-/* BIG BANG */
-
 case "BIGBANG":
 
-if(!bigBangTriggered){
-
-for(let i=0;i<1000;i++){
-
-particles.push(new Particle(canvas.width/2,canvas.height/2))
-
-}
-
-screenShake()
-
-document.body.style.background=
-"linear-gradient(135deg,#ff6ec4,#7873f5)"
-
-typeWriter(
-"Trong vũ trụ tri thức rộng lớn, cô chính là ngôi sao dẫn đường cho chúng em. Cảm ơn cô vì tất cả."
-)
-
-bigBangTriggered=true
-
-}
-
 particles.forEach(p=>{
-p.update()
-p.draw()
+
+p.vx*=0.96
+p.vy*=0.96
+
+p.x+=p.vx
+p.y+=p.vy
+
+p.life-=0.01
+
+ctx.globalAlpha=p.life
+ctx.fillStyle=["magenta","cyan","gold"][Math.floor(Math.random()*3)]
+
+ctx.fillRect(p.x,p.y,2,2)
+
+ctx.globalAlpha=1
+
 })
 
 particles=particles.filter(p=>p.life>0)
+
+if(particles.length===0){
+
+document.body.style.background="#3c0b5f"
+
+phase="TEACHER"
+
+document.getElementById("teacherPage").innerHTML=
+"<h2>"+teacherData.title+"</h2><br>"
+
+typeWriter(teacherData.msg)
+
+}
 
 break
 
@@ -523,5 +491,6 @@ requestAnimationFrame(animate)
 animate()
 
 </script>
+
 </body>
 </html>
