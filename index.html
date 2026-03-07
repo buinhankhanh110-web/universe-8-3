@@ -4,97 +4,93 @@
     <meta charset="UTF-8">
     <title>8/3 - Hyper-Realistic Classroom Universe</title>
     <style>
-       :root {
-    --cyan-glow: #00ffff;
-    --pink-glow: #ff75c3;
-    --space-black: #000205;
-}
+        :root {
+            --cyan-glow: #00ffff;
+            --pink-glow: #ff75c3;
+            --space-black: #000205;
+        }
 
-body, html {
-    margin: 0; padding: 0; width: 100%; height: 100%;
-    overflow: hidden; background: var(--space-black);
-    font-family: 'Segoe UI', sans-serif;
-}
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: var(--space-black);
+            font-family: 'Segoe UI', sans-serif;
+        }
 
-canvas { position: fixed; top: 0; left: 0; z-index: 1; }
+        canvas { position: fixed; top: 0; left: 0; z-index: 1; }
 
-/* LỚP GIAO DIỆN CHÍNH */
-.ui-layer {
-    position: fixed; inset: 0; z-index: 10;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    pointer-events: none; transition: 2s;
-}
-.interactive { pointer-events: all; }
+        /* LỚP GIAO DIỆN CHÍNH */
+        .ui-layer {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none; transition: 2s;
+        }
 
-/* PORTAL CỔNG XANH SIÊU THỰC */
-.portal-container {
-    position: relative; width: 250px; height: 250px; margin-bottom: 50px;
-}
-.portal-ring {
-    position: absolute; inset: 0;
-    border: 2px solid var(--cyan-glow); border-radius: 50%;
-    box-shadow: 0 0 50px var(--cyan-glow), inset 0 0 30px var(--cyan-glow);
-    animation: rotate 10s linear infinite;
-}
-.portal-core {
-    position: absolute; inset: 20px;
-    background: radial-gradient(circle, #fff 0%, var(--cyan-glow) 40%, transparent 70%);
-    border-radius: 50%; filter: blur(8px);
-    animation: pulse 3s ease-in-out infinite;
-}
+        #login-panel {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; text-align: center;
+            pointer-events: all;
+        }
 
-@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.15); opacity: 0.8; } }
+        .portal-container { position: relative; width: 250px; height: 250px; margin-bottom: 50px; }
+        .portal-ring {
+            position: absolute; inset: 0;
+            border: 2px solid var(--cyan-glow); border-radius: 50%;
+            box-shadow: 0 0 50px var(--cyan-glow), inset 0 0 30px var(--cyan-glow);
+            animation: rotate 10s linear infinite;
+        }
+        .portal-core {
+            position: absolute; inset: 20px;
+            background: radial-gradient(circle, #fff 0%, var(--cyan-glow) 40%, transparent 70%);
+            border-radius: 50%; filter: blur(8px);
+            animation: pulse 3s ease-in-out infinite;
+        }
 
-/* TYPOGRAPHY & INPUT */
-.cosmic-title {
-    color: white; font-size: 3.5rem; letter-spacing: 15px;
-    text-shadow: 0 0 30px var(--cyan-glow); margin: 0; text-transform: uppercase;
-}
-input.cosmic-input {
-    margin-top: 30px; background: rgba(255,255,255,0.05);
-    border: 1px solid var(--cyan-glow); padding: 15px 25px;
-    color: white; border-radius: 50px; text-align: center;
-    width: 320px; font-size: 1.2rem; outline: none;
-    backdrop-filter: blur(15px); transition: 0.5s;
-}
-input.cosmic-input:focus { box-shadow: 0 0 40px var(--cyan-glow); background: rgba(0,255,255,0.1); }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.15); opacity: 0.8; } }
 
-button.launch-btn {
-    margin-top: 25px; padding: 15px 70px; border-radius: 50px;
-    border: none; background: white; color: black; font-weight: 900;
-    cursor: pointer; text-transform: uppercase; letter-spacing: 3px;
-    transition: 0.4s; box-shadow: 0 0 20px rgba(255,255,255,0.3);
-}
-button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 0 60px white; }
+        .cosmic-title {
+            color: white; font-size: 3.5rem; letter-spacing: 15px;
+            text-shadow: 0 0 30px var(--cyan-glow); margin: 0; text-transform: uppercase;
+        }
+        input.cosmic-input {
+            margin-top: 30px; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--cyan-glow); padding: 15px 25px;
+            color: white; border-radius: 50px; text-align: center;
+            width: 320px; font-size: 1.2rem; outline: none;
+            backdrop-filter: blur(15px); transition: 0.5s;
+        }
+        button.launch-btn {
+            margin-top: 25px; padding: 15px 70px; border-radius: 50px;
+            border: none; background: white; color: black; font-weight: 900;
+            cursor: pointer; text-transform: uppercase; letter-spacing: 3px;
+            transition: 0.4s;
+        }
 
-/* HIỆU ỨNG THÔNG TIN CÁ NHÂN (PINK GALAXY) */
-.info-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    display: none; justify-content: center; align-items: center;
-    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px);
-}
-.galaxy-card {
-    background: linear-gradient(135deg, rgba(255, 117, 195, 0.2), rgba(0, 255, 255, 0.15));
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 50px; border-radius: 40px; color: white;
-    text-align: center; width: 90%; max-width: 550px;
-    box-shadow: 0 0 60px rgba(255, 117, 195, 0.3);
-}
-.girl-avatar {
-    width: 180px; height: 180px; border-radius: 50%;
-    margin: 0 auto 25px; border: 5px solid white;
-    box-shadow: 0 0 40px var(--pink-glow);
-    background-size: cover; background-position: center;
-}
-.hidden { opacity: 0; pointer-events: none; }
+        .info-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            display: none; justify-content: center; align-items: center;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(25px);
+            opacity: 0; transition: 0.5s;
+        }
+        .galaxy-card {
+            background: linear-gradient(135deg, rgba(255, 117, 195, 0.2), rgba(0, 255, 255, 0.15));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px; border-radius: 40px; color: white;
+            text-align: center; width: 90%; max-width: 550px;
+        }
+        .girl-avatar {
+            width: 150px; height: 150px; border-radius: 50%; margin: 0 auto 20px;
+            border: 3px solid white; box-shadow: 0 0 30px var(--pink-glow);
+            background-size: cover; background-position: center;
+        }
+        .hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <canvas id="universe"></canvas>
 
-    <div class="ui-layer interactive" id="gate-ui">
+    <div class="ui-layer" id="gate-ui">
         <div id="login-panel">
             <div class="portal-container">
                 <div class="portal-ring"></div>
@@ -106,15 +102,17 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
             <button class="launch-btn" onclick="CosmicEngine.warpDrive()">KHỞI ĐỘNG</button>
         </div>
     </div>
-<div class="info-overlay" id="detail-overlay" onclick="CosmicEngine.closeDetail()">
+
+    <div class="info-overlay" id="detail-overlay" onclick="CosmicEngine.closeDetail()">
         <div class="galaxy-card" id="detail-card">
             <div class="girl-avatar" id="girl-img"></div>
             <h2 id="girl-name" style="color: var(--cyan-glow); letter-spacing: 5px;">TÊN BẠN NỮ</h2>
-            <p id="girl-wish" style="font-style: italic; line-height: 1.6;">Lời chúc sẽ hiện ở đây...</p>
+            <p id="girl-wish" style="font-style: italic; line-height: 1.6;">Lời chúc...</p>
             <button class="launch-btn" style="padding: 10px 30px;">ĐÓNG</button>
         </div>
     </div>
-  <script>
+
+<script>
     const CosmicConfig = {
         starCount: 1500,
         meteorChance: 0.005,
@@ -123,13 +121,8 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
         gatePassword: "83"
     };
 
-    // --- CÁC THỰC THỂ VŨ TRỤ ---
-
     class Particle {
-        constructor(w, h) {
-            this.w = w; this.h = h;
-            this.init();
-        }
+        constructor(w, h) { this.w = w; this.h = h; this.init(); }
         init() {
             this.x = Math.random() * this.w - this.w / 2;
             this.y = Math.random() * this.h - this.h / 2;
@@ -140,36 +133,26 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
         update(speed) {
             this.pz = this.z;
             this.z -= speed;
-            if (this.z < 1) {
-                this.init();
-                this.pz = this.z;
-            }
+            if (this.z < 1) { this.init(); this.pz = this.z; }
         }
         draw(ctx, w, h) {
             let sx = (this.x / this.z) * w + w / 2;
             let sy = (this.y / this.z) * h + h / 2;
             let px = (this.x / this.pz) * w + w / 2;
             let py = (this.y / this.pz) * h + h / 2;
-            let r = (1 - this.z / w) * 2;
             ctx.strokeStyle = this.color;
-            ctx.lineWidth = r;
-            ctx.beginPath();
-            ctx.moveTo(px, py);
-            ctx.lineTo(sx, sy);
-            ctx.stroke();
+            ctx.lineWidth = (1 - this.z / w) * 2;
+            ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(sx, sy); ctx.stroke();
         }
     }
 
     class Nebula {
         constructor(canvas) {
-            this.canvas = canvas;
-            this.points = [];
+            this.canvas = canvas; this.points = [];
             for(let i = 0; i < 5; i++) {
                 this.points.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
+                    x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
                     radius: Math.random() * 400 + 300,
                     color: i % 2 === 0 ? 'rgba(0, 255, 255, 0.03)' : 'rgba(255, 117, 195, 0.02)'
                 });
@@ -185,10 +168,8 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
         draw(ctx) {
             this.points.forEach(p => {
                 let grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
-                grad.addColorStop(0, p.color);
-                grad.addColorStop(1, 'transparent');
-                ctx.fillStyle = grad;
-                ctx.globalCompositeOperation = 'screen';
+                grad.addColorStop(0, p.color); grad.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad; ctx.globalCompositeOperation = 'screen';
                 ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 ctx.globalCompositeOperation = 'source-over';
             });
@@ -196,39 +177,25 @@ button.launch-btn:hover { transform: scale(1.1) translateY(-3px); box-shadow: 0 
     }
 
     class Meteor {
-        constructor(canvas) {
-            this.canvas = canvas;
-            this.reset();
-        }
+        constructor(canvas) { this.canvas = canvas; this.reset(); }
         reset() {
-            this.x = Math.random() * this.canvas.width;
-            this.y = -200;
-            this.speed = Math.random() * 15 + 10;
-            this.len = Math.random() * 100 + 50;
-            this.opacity = 1;
+            this.x = Math.random() * this.canvas.width; this.y = -200;
+            this.speed = Math.random() * 15 + 10; this.len = Math.random() * 100 + 50; this.opacity = 1;
         }
         update() {
-            this.x += this.speed;
-            this.y += this.speed;
-            this.opacity -= 0.01;
+            this.x += this.speed; this.y += this.speed; this.opacity -= 0.01;
             if(this.opacity <= 0 || this.y > this.canvas.height) this.reset();
         }
         draw(ctx) {
-            ctx.save();
-            ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x - this.len, this.y - this.len);
-            ctx.stroke();
-            ctx.restore();
+            ctx.save(); ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x - this.len, this.y - this.len); ctx.stroke(); ctx.restore();
         }
     }
-class GirlStar {
+
+    class GirlStar {
         constructor(id, canvas) {
-            this.canvas = canvas;
-            this.id = id;
-            this.init();
+            this.canvas = canvas; this.id = id; this.init();
         }
         init() {
             this.x = (Math.random() - 0.5) * this.canvas.width * 2.5;
@@ -236,8 +203,14 @@ class GirlStar {
             this.z = Math.random() * this.canvas.width;
             this.color = Math.random() > 0.5 ? "#ff75c3" : "#00ffff";
             this.angle = Math.random() * Math.PI * 2;
-            this.name = "Bạn Nữ " + (this.id + 1);
-            this.wish = "Chúc bạn một ngày 8/3 thật xinh đẹp và hạnh phúc!";
+            const classGirls = [
+                { n: "Linh Chi", w: "Chúc Chi luôn xinh đẹp và rạng rỡ!" },
+                { n: "Minh Anh", w: "Chúc Minh Anh học giỏi và luôn vui vẻ!" },
+                { n: "Lan Hương", w: "Chúc Hương luôn dịu dàng và hạnh phúc!" },
+                { n: "Thanh Trúc", w: "Mạnh mẽ và tỏa sáng nhé Trúc!" }
+            ];
+            const p = classGirls[this.id] || { n: `Bạn Nữ ${this.id + 1}`, w: "Chúc bạn 8/3 tuyệt vời!" };
+            this.name = p.n; this.wish = p.w;
             this.screenX = 0; this.screenY = 0; this.finalR = 0;
         }
         update() { this.angle += 0.01; this.y += Math.sin(this.angle) * 0.2; }
@@ -255,13 +228,9 @@ class GirlStar {
             this.screenX = x2d; this.screenY = y2d; this.finalR = r * 4;
         }
     }
-    // --- ENGINE ĐIỀU KHIỂN CHÍNH ---
 
-   const CosmicEngine = {
-        canvas: null, ctx: null,
-        stars: [], meteors: [], femaleStars: [], nebula: null,
-        speed: CosmicConfig.baseSpeed,
-
+    const CosmicEngine = {
+        canvas: null, ctx: null, stars: [], meteors: [], femaleStars: [], nebula: null, speed: CosmicConfig.baseSpeed,
         init() {
             this.canvas = document.getElementById('universe');
             this.ctx = this.canvas.getContext('2d');
@@ -269,14 +238,10 @@ class GirlStar {
             window.addEventListener('resize', () => this.resize());
             this.nebula = new Nebula(this.canvas);
             for(let i=0; i<3; i++) this.meteors.push(new Meteor(this.canvas));
-            for(let i=0; i < CosmicConfig.starCount; i++) {
-                this.stars.push(new Particle(this.canvas.width, this.canvas.height));
-            }
+            for(let i=0; i < CosmicConfig.starCount; i++) this.stars.push(new Particle(this.canvas.width, this.canvas.height));
             this.render();
         },
-
         resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; },
-
         warpDrive() {
             const p = document.getElementById('gate-pass').value;
             if(p === CosmicConfig.gatePassword) {
@@ -288,36 +253,40 @@ class GirlStar {
                         setTimeout(() => this.enterUniverse(), 1200);
                     }
                 }, 50);
-            } else { alert("Sai mật mã!"); }
+            } else { alert("Mật mã là 83 nhé!"); }
         },
-
         enterUniverse() {
+            if (this.femaleStars.length > 0) return;
             let slowDown = setInterval(() => {
                 this.speed -= 1;
                 if(this.speed <= 1.5) {
-                    clearInterval(slowDown);
-                    this.speed = 1.5;
-                    // Tạo 30 thực thể bạn nữ
+                    clearInterval(slowDown); this.speed = 1.5;
                     for(let i=0; i<30; i++) this.femaleStars.push(new GirlStar(i, this.canvas));
-                    this.canvas.addEventListener('click', (e) => this.checkClick(e));
+                    this.canvas.style.cursor = "pointer";
+                    this.canvas.onclick = (e) => this.checkClick(e);
                 }
             }, 100);
         },
-
         checkClick(e) {
+            if(document.getElementById('detail-overlay').style.display === 'flex') return;
             this.femaleStars.forEach(s => {
                 let dist = Math.hypot(e.clientX - s.screenX, e.clientY - s.screenY);
-                if(dist < s.finalR) {
-                    document.getElementById('girl-name').innerText = s.name;
-                    document.getElementById('girl-wish').innerText = s.wish;
-                    document.getElementById('girl-img').style.backgroundImage = `url('img/image_${s.id % 3}.png')`; // Tự lặp lại 3 ảnh bạn có
-                    document.getElementById('detail-overlay').style.display = 'flex';
-                }
+                if(dist < s.finalR) this.showDetail(s);
             });
         },
-
-        closeDetail() { document.getElementById('detail-overlay').style.display = 'none'; },
-
+        showDetail(s) {
+            const overlay = document.getElementById('detail-overlay');
+            document.getElementById('girl-name').innerText = s.name;
+            document.getElementById('girl-wish').innerText = s.wish;
+            document.getElementById('girl-img').style.backgroundImage = `url('img/image_${s.id % 3}.png')`;
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        },
+        closeDetail() {
+            const overlay = document.getElementById('detail-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+        },
         render() {
             this.ctx.fillStyle = "rgba(0, 2, 5, 0.2)";
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
